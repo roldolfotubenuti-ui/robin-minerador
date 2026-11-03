@@ -1,0 +1,431 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Robin-minerador</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <!-- TELA DE BLOQUEIO / LOGIN (DESIGN SEGUNDA IMAGEM + MASCOTE FANTASMA) -->
+  <div id="auth-screen" class="auth-wrapper">
+    <!-- Card Principal de Login (Segunda Imagem) -->
+    <div id="auth-main-card" class="auth-card">
+      <!-- Coluna da Esquerda: Imagem com Mascote Fantasma e Texto "EXPLORE. LEARN. GROW." -->
+      <div class="auth-visual-side">
+        <img src="assets/ghost_login_banner.jpg" alt="Mascote Fantasma - Explore. Learn. Grow." class="auth-banner-img" />
+      </div>
+
+      <!-- Coluna da Direita: Formulário de Acesso -->
+      <div class="auth-form-side">
+        <div class="auth-brand-header">
+          <div class="auth-mascot-logo">
+            <img src="assets/ghost_logo_icon.jpg" alt="Robin Logo" class="auth-logo-img" />
+          </div>
+          <span class="auth-brand-tag">ROBIN.IA</span>
+          <h2 id="auth-title" class="auth-title">WELCOME BACK</h2>
+          <p id="auth-subtitle" class="auth-subtitle">Enter your email and password to access your account</p>
+        </div>
+
+        <!-- Abas de alternância Entrar / Criar Conta -->
+        <div class="auth-tabs-nav">
+          <button type="button" id="tab-auth-login" class="auth-tab-btn active">Entrar</button>
+          <button type="button" id="tab-auth-signup" class="auth-tab-btn">Criar Conta</button>
+        </div>
+
+        <div id="auth-alert" class="auth-alert hidden" role="alert"></div>
+
+        <form id="auth-form" class="auth-form">
+          <label class="auth-field">
+            <span class="auth-label">Email</span>
+            <input id="auth-email" type="email" placeholder="seuemail@exemplo.com" required autocomplete="email" class="auth-input" />
+          </label>
+
+          <label id="auth-password-field" class="auth-field">
+            <span class="auth-label">Password</span>
+            <input id="auth-password" type="password" placeholder="••••••••" required autocomplete="current-password" class="auth-input" />
+          </label>
+
+          <!-- Campos do Fluxo de Recuperação por Código OTP (In-Popup) -->
+          <div id="auth-recovery-container" class="auth-recovery-container hidden">
+            <button id="btn-request-otp" type="button" class="auth-btn-secondary">
+              Enviar Código por E-mail
+            </button>
+
+            <label id="auth-otp-field" class="auth-field hidden">
+              <span class="auth-label">Código de 6 Dígitos (OTP)</span>
+              <input id="auth-otp-code" type="text" placeholder="123456" maxlength="8" autocomplete="one-time-code" class="auth-input" />
+            </label>
+
+            <label id="auth-new-password-field" class="auth-field hidden">
+              <span class="auth-label">Nova Senha</span>
+              <input id="auth-new-password" type="password" placeholder="Nova senha (min. 6 dígitos)" autocomplete="new-password" class="auth-input" />
+            </label>
+          </div>
+
+          <div id="auth-options-row" class="auth-options-row">
+            <label class="auth-remember">
+              <input type="checkbox" id="auth-remember" checked />
+              <span>Remember me</span>
+            </label>
+            <a href="#" id="auth-forgot-password" class="auth-forgot">Forgot Password?</a>
+          </div>
+
+          <button id="btn-login" type="submit" class="auth-btn-signin">
+            Sign In
+          </button>
+        </form>
+
+
+        <div id="auth-footer-prompt" class="auth-footer-prompt">
+          <span id="auth-footer-text">Don't have an account? <a href="#" id="link-toggle-signup">Sign up</a></span>
+        </div>
+        <div class="auth-cakto-checkout-hint">
+          <span>Ainda não assinou o Robin? <a href="https://pay.cakto.com.br/qw6ns6o_1234667" target="_blank" rel="noopener">Assinar na Cakto (R$ 67,90/mês) ↗</a></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tela de Erro 404 (Imagem 4) se não encontrar o email ou for inválido -->
+    <div id="auth-error-view" class="auth-error-overlay hidden" role="alert">
+      <div class="auth-error-card">
+        <img src="assets/error_404_ghost.png" alt="404 - Não encontramos seu acesso, confirme o pagamento" class="auth-error-img" />
+        <div class="auth-error-actions">
+          <button id="btn-error-retry" type="button" class="btn-error-retry">
+            ← Tentar novamente
+          </button>
+          <a href="https://pay.cakto.com.br/qw6ns6o_1234667" id="btn-error-cakto" target="_blank" rel="noopener" class="btn-error-cakto">
+            Confirmar Pagamento na Cakto ↗
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="app-shell" class="app-shell hidden">
+    <div class="app-container-card">
+      <div class="app-left-panel">
+        <!-- Top Header -->
+        <header class="top-bar">
+          <div class="brand">
+            <div class="brand-emblem-wrap">
+              <img src="assets/robin_header_logo.png" alt="Robin Mascot" class="brand-mascot-img" />
+            </div>
+            <div class="brand-text">
+              <h1>Robin-minerador <span class="version-tag">1.0</span></h1>
+              <p id="context-subtitle">Minerador Universal · Instagram · TikTok · Shorts</p>
+            </div>
+          </div>
+
+          <div class="header-actions">
+            <span id="companion-pill" class="status-pill" title="Status do servidor local Companion">
+              Companion: Verificando...
+            </span>
+            <button id="demo-pill" type="button" class="mode-pill" title="Ativar/desativar dados de demonstração">
+              MODO DEMO: OFF
+            </button>
+            <button id="btn-open-tab" type="button" class="mode-pill tab-pill" title="Abrir em aba cheia (nunca fecha ao baixar)">
+              ⤢ ABA CHEIA
+            </button>
+          </div>
+        </header>
+
+        <!-- Navigation Tabs -->
+        <nav class="nav-tabs" aria-label="Navegação Principal">
+          <button type="button" class="nav-tab active" data-tab="miner"><span class="tab-ico">⛏</span> MINERADOR</button>
+          <button type="button" class="nav-tab" data-tab="history"><span class="tab-ico">🕒</span> HISTÓRICO</button>
+          <button type="button" class="nav-tab" data-tab="settings"><span class="tab-ico">⚙</span> AJUSTES</button>
+        </nav>
+
+        <!-- TAB 1: MINERADOR -->
+        <main id="tab-miner" class="tab-panel active">
+          <!-- Intro / Configuration Section -->
+          <section id="view-intro" class="panel-card">
+            <div class="context-banner">
+              <div class="context-banner-info">
+                <span class="eyebrow" id="detected-platform-label">
+                  <svg class="instagram-icon" viewBox="0 0 24 24" width="13" height="13">
+                    <rect x="2" y="2" width="20" height="20" rx="5" fill="none" stroke="currentColor" stroke-width="2"/>
+                    <circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2"/>
+                    <circle cx="18" cy="6" r="1.5" fill="currentColor"/>
+                  </svg>
+                  INSTAGRAM (DEMO)
+                </span>
+                <h2 id="detected-profile-title">@criador_demo</h2>
+                <p id="detected-hint">Modo demonstração ativo — clique em Minerar Perfil para testar todo o fluxo.</p>
+              </div>
+              <div class="context-banner-mascot-wrap">
+                <span id="ready-badge" class="ready-pill">PRONTO (DEMO)</span>
+                <img src="assets/robin_banner_peeking_ghost.png" alt="Robin Mascot" class="banner-peeking-ghost" />
+              </div>
+            </div>
+
+        <div class="config-grid">
+          <label class="field">
+            <span>Critério de Ranking</span>
+            <select id="discovery-sort">
+              <option value="viral">🔥 Potencial Viral (Score 0–100)</option>
+              <option value="views">👁️ Mais Visualizações</option>
+              <option value="likes">❤️ Mais Curtidas</option>
+              <option value="comments">💬 Mais Comentários</option>
+              <option value="recent">🕒 Mais Recentes</option>
+            </select>
+          </label>
+
+          <label class="field">
+            <span>Quantidade de Aprovados (1–500)</span>
+            <input id="discovery-limit" type="number" min="1" max="500" value="50" />
+          </label>
+
+          <label class="field">
+            <span>Escopo de Varredura</span>
+            <select id="discovery-scope-mode">
+              <option value="all">Analisar todo o perfil disponível</option>
+              <option value="custom">Limitar aos N vídeos mais recentes</option>
+            </select>
+          </label>
+
+          <label id="scope-count-wrap" class="field hidden">
+            <span>Limite de Vídeos Recentes (1–5000)</span>
+            <input id="discovery-scope-count" type="number" min="1" max="5000" value="300" />
+          </label>
+        </div>
+
+        <div class="filters-box">
+          <div class="filters-header">
+            <span>FILTROS MÍNIMOS CUMULATIVOS</span>
+            <small>Ex.: 50K, 1.5M, 500 (0 = sem mínimo)</small>
+          </div>
+          <div class="filters-row">
+            <label class="field">
+              <span>Mín. Visualizações</span>
+              <input id="filter-min-views" type="text" placeholder="Ex: 100K" value="0" />
+            </label>
+            <label class="field">
+              <span>Mín. Curtidas</span>
+              <input id="filter-min-likes" type="text" placeholder="Ex: 5K" value="0" />
+            </label>
+            <label class="field">
+              <span>Mín. Comentários</span>
+              <input id="filter-min-comments" type="text" placeholder="Ex: 100" value="0" />
+            </label>
+          </div>
+        </div>
+
+        <div class="cta-row">
+          <button id="btn-start-analysis" type="button" class="btn-primary">
+            ⚡ MINERAR PERFIL AGORA
+          </button>
+          <button id="btn-manual-select" type="button" class="btn-secondary">
+            🎯 SELECIONAR MANUALMENTE NA PÁGINA
+          </button>
+        </div>
+      </section>
+
+      <!-- Progress Section -->
+      <section id="view-progress" class="panel-card hidden">
+        <div class="progress-card">
+          <span class="eyebrow">MINERAÇÃO EM ANDAMENTO</span>
+          <h3 id="analysis-stage-title">Consultando vídeos do perfil...</h3>
+          <div class="progress-bar-track">
+            <div id="analysis-progress-fill" class="progress-bar-fill" style="width: 8%"></div>
+          </div>
+          <div class="progress-meta">
+            <span id="analysis-count-label">0 aprovados</span>
+            <span id="analysis-percent-label">8%</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Results Section -->
+      <section id="view-results" class="results-section hidden">
+        <div class="stats-strip">
+          <div class="stat-box">
+            <span>APROVADOS</span>
+            <strong id="stat-approved">0</strong>
+          </div>
+          <div class="stat-box">
+            <span>CATÁLOGO LIDO</span>
+            <strong id="stat-catalog">0</strong>
+          </div>
+          <div class="stat-box">
+            <span>IGNORADOS (JÁ BAIXADOS)</span>
+            <strong id="stat-skipped">0</strong>
+          </div>
+          <div class="stat-box">
+            <span>SCORE VIRAL MÉDIO</span>
+            <strong id="stat-avg-score">0</strong>
+          </div>
+        </div>
+
+        <div class="toolbar-strip">
+          <div class="quick-buttons">
+            <label class="check-all-label">
+              <input id="select-all-checkbox" type="checkbox" />
+              <span>Todos</span>
+            </label>
+            <button type="button" class="chip-btn" data-top="10">Top 10</button>
+            <button type="button" class="chip-btn" data-top="25">Top 25</button>
+            <button type="button" class="chip-btn" data-top="50">Top 50</button>
+            <button type="button" class="chip-btn" data-top="none">Limpar</button>
+          </div>
+
+          <div class="toolbar-right">
+            <select id="results-sort-select" aria-label="Reordenar resultados">
+              <option value="viral">Ordenar: Score Viral</option>
+              <option value="views">Ordenar: Visualizações</option>
+              <option value="likes">Ordenar: Curtidas</option>
+              <option value="comments">Ordenar: Comentários</option>
+              <option value="recent">Ordenar: Recentes</option>
+            </select>
+            <button id="btn-similar-profiles" type="button" class="btn-ghost">👥 Semelhantes</button>
+            <button id="btn-reanalyze" type="button" class="btn-ghost">🔄 Nova Mineração</button>
+          </div>
+        </div>
+
+        <div id="reels-grid" class="reels-grid"></div>
+
+        <!-- Sticky Footer Download Bar -->
+        <footer class="download-bar">
+          <div class="download-bar-info">
+            <strong id="selected-counter">0 selecionados</strong>
+            <span id="selected-subtitle">Pronto para empacotar ZIP + CSV</span>
+          </div>
+
+          <div class="download-bar-controls">
+            <select id="archive-mode-select" aria-label="Modo de compactação">
+              <option value="single">1 ZIP com tudo</option>
+              <option value="batches">ZIPs em lotes</option>
+            </select>
+            <input id="batch-size-input" type="number" min="1" max="500" value="50" title="Vídeos por ZIP" />
+            <button id="btn-download-selected" type="button" class="btn-primary">
+              ⬇️ BAIXAR SELECIONADOS
+            </button>
+          </div>
+        </footer>
+      </section>
+    </main>
+
+    <!-- TAB 2: HISTÓRICO -->
+    <section id="tab-history" class="tab-panel">
+      <div class="panel-card">
+        <div class="section-head">
+          <div>
+            <h2>Histórico de Perfis Minerados</h2>
+            <p>Clique em um perfil salvo para reabrir os vídeos ou limpe o registro de duplicados.</p>
+          </div>
+          <button id="btn-clear-history" type="button" class="btn-danger">Apagar Histórico</button>
+        </div>
+        <div id="history-list" class="history-list"></div>
+      </div>
+    </section>
+
+    <!-- TAB 3: AJUSTES -->
+    <section id="tab-settings" class="tab-panel">
+      <!-- Card da Conta / Licença Cakto -->
+      <div class="panel-card account-card">
+        <div class="account-header">
+          <div>
+            <span class="eyebrow">MINHA ASSINATURA CAKTO</span>
+            <h2 id="account-email-display">admin@jdark.com</h2>
+            <p>Acesso liberado com sincronização em tempo real.</p>
+          </div>
+          <span id="account-status-badge" class="ready-pill account-active-pill">PAGAMENTO ATIVO</span>
+        </div>
+        <div class="account-actions">
+          <button id="btn-logout" type="button" class="btn-danger">
+            🚪 Sair da Conta
+          </button>
+        </div>
+      </div>
+
+      <div class="panel-card settings-card">
+        <h2>Ajustes do J-Dark</h2>
+        <label class="toggle-row">
+          <div>
+            <strong>Bloquear vídeos já baixados (Buscar somente novos)</strong>
+            <p>Ignora automaticamente nas próximas minerações os códigos que já foram baixados.</p>
+          </div>
+          <input id="setting-block-duplicates" type="checkbox" checked />
+        </label>
+
+        <label class="toggle-row">
+          <div>
+            <strong>Incluir planilha CSV de métricas dentro do ZIP</strong>
+            <p>Gera automaticamente o arquivo <code>metricas_perfil.csv</code> com Score Viral, views, likes, comentários e links.</p>
+          </div>
+          <input id="setting-include-csv" type="checkbox" checked />
+        </label>
+
+        <label class="toggle-row">
+          <div>
+            <strong>Perguntar onde salvar cada arquivo ("Salvar como")</strong>
+            <p>Quando desativado, salva direto na pasta padrão <code>Downloads/J-Dark</code>.</p>
+          </div>
+          <input id="setting-save-as" type="checkbox" />
+        </label>
+
+        <label class="toggle-row">
+          <div>
+            <strong>Modo de Demonstração (Dados Simulados)</strong>
+            <p>Permite testar a interface, filtros, ranking e geração de ZIP/CSV em qualquer aba.</p>
+          </div>
+          <input id="setting-demo-mode" type="checkbox" />
+        </label>
+      </div>
+    </section>
+      </div> <!-- fim .app-left-panel -->
+
+      <!-- Coluna da Direita: Ilustração 3D Robin Mascot (Imagem 5) -->
+      <aside class="app-right-banner">
+        <img src="assets/robin_side_banner.png" alt="Robin.ia 3D Mascot" class="robin-3d-banner-img" />
+      </aside>
+    </div> <!-- fim .app-container-card -->
+  </div> <!-- fim #app-shell -->
+
+  <!-- MODAL: PROGRESSO DE DOWNLOAD (<dialog closedby="any">) -->
+  <dialog id="download-dialog" closedby="any" aria-labelledby="download-dialog-title">
+    <div class="modal-card">
+      <div class="modal-head">
+        <span class="eyebrow">GERENCIADOR DE DOWNLOAD J-DARK</span>
+        <h3 id="download-dialog-title">Processando vídeos...</h3>
+      </div>
+      <p id="download-stage-text" class="modal-stage">Preparando lote...</p>
+      <div class="progress-bar-track">
+        <div id="download-progress-fill" class="progress-bar-fill" style="width: 2%"></div>
+      </div>
+      <div class="progress-meta">
+        <span id="download-counts-text">0 / 0 concluídos</span>
+        <span id="download-percent-text">0%</span>
+      </div>
+      <p id="download-result-summary" class="modal-summary"></p>
+      <div class="modal-actions">
+        <button id="btn-close-download-dialog" type="button" class="btn-secondary">FECHAR</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- MODAL: PERFIS SEMELHANTES (<dialog closedby="any">) -->
+  <dialog id="similar-dialog" closedby="any" aria-labelledby="similar-dialog-title">
+    <div class="modal-card">
+      <div class="modal-head">
+        <span class="eyebrow">DESCOBERTA DE CRIADORES</span>
+        <h3 id="similar-dialog-title">Perfis Semelhantes</h3>
+      </div>
+      <div id="similar-profiles-list" class="similar-list"></div>
+      <div class="modal-actions">
+        <button id="btn-close-similar-dialog" type="button" class="btn-secondary">FECHAR</button>
+      </div>
+    </div>
+  </dialog>
+
+  <div id="toast-banner" class="toast hidden" role="status" aria-live="polite"></div>
+
+  <script src="lib/core.js"></script>
+  <script src="lib/supabase-auth.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

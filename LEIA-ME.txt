@@ -1,0 +1,24 @@
+J-DARK 1.0 — MINERADOR UNIVERSAL DE VÍDEOS VIRAIS
+=================================================
+
+ESTRUTURA DO PROJETO
+--------------------
+1. EXTENSAO-JDARK:
+   Extensão Chrome / Edge (Manifest V3) pronta para uso imediato, sem necessidade de login ou ativação.
+   Suporta Instagram Reels, TikTok e YouTube Shorts.
+
+2. COMPANION-WINDOWS:
+   Servidor local nativo (J-Dark Companion.exe) que escuta em http://127.0.0.1:17832 e utiliza yt-dlp + ffmpeg para baixar vídeos em alta qualidade, gerar relatórios CSV de métricas e compactar lotes em arquivos .ZIP na pasta Downloads\J-Dark.
+
+COMO INSTALAR A EXTENSÃO NO CHROME OU EDGE
+------------------------------------------
+1. Abra o navegador e acesse chrome://extensions ou edge://extensions.
+2. Ative a chave "Modo do desenvolvedor" (Developer mode).
+3. Clique em "Carregar sem compactação" (Load unpacked).
+4. Selecione a pasta EXTENSAO-JDARK dentro de J-Dark na sua Área de Trabalho.
+
+COMO INICIAR O J-DARK COMPANION NO WINDOWS
+------------------------------------------
+1. Abra a pasta COMPANION-WINDOWS.
+2. Execute INSTALAR-JDARK-WINDOWS.bat (ou execute diretamente J-Dark Companion.exe).
+3. O indicador no topo da extensão mudará automaticamente para "Companion: Online".

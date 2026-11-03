@@ -1,0 +1,108 @@
+{
+  "manifest_version": 3,
+  "name": "Robin-minerador",
+  "version": "1.0.0",
+  "description": "Analise métricas, calcule potencial viral, selecione na página e baixe vídeos do Instagram Reels, TikTok e YouTube Shorts.",
+  "icons": {
+    "16": "icons/icon-16.png",
+    "32": "icons/icon-32.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  },
+  "action": {
+    "default_title": "Robin-minerador",
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "32": "icons/icon-32.png",
+      "48": "icons/icon-48.png",
+      "128": "icons/icon-128.png"
+    }
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "permissions": [
+    "activeTab",
+    "alarms",
+    "downloads",
+    "offscreen",
+    "scripting",
+    "storage",
+    "tabs"
+  ],
+  "host_permissions": [
+    "https://*.instagram.com/*",
+    "https://*.cdninstagram.com/*",
+    "https://*.fbcdn.net/*",
+    "https://*.fbsbx.net/*",
+    "https://*.tiktok.com/*",
+    "https://*.tiktokcdn.com/*",
+    "https://*.tiktokcdn-us.com/*",
+    "https://*.tiktokcdn-eu.com/*",
+    "https://*.tiktokv.com/*",
+    "https://*.byteoversea.com/*",
+    "https://*.ibytedtos.com/*",
+    "https://*.youtube.com/*",
+    "https://*.googlevideo.com/*",
+    "https://*.ytimg.com/*",
+    "https://*.supabase.co/*",
+    "http://127.0.0.1:17832/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.instagram.com/*",
+        "https://instagram.com/*"
+      ],
+      "js": [
+        "lib/core.js",
+        "collectors/instagram.js",
+        "overlay.js"
+      ],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://www.tiktok.com/*",
+        "https://tiktok.com/*"
+      ],
+      "js": [
+        "lib/core.js",
+        "collectors/tiktok.js",
+        "overlay.js"
+      ],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://www.youtube.com/*",
+        "https://youtube.com/*",
+        "https://m.youtube.com/*"
+      ],
+      "js": [
+        "lib/core.js",
+        "collectors/youtube.js",
+        "overlay.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "popup.html",
+        "popup.css",
+        "popup.js",
+        "lib/core.js",
+        "icons/*",
+        "assets/*"
+      ],
+      "matches": [
+        "https://*.instagram.com/*",
+        "https://*.tiktok.com/*",
+        "https://*.youtube.com/*"
+      ]
+    }
+  ]
+}
