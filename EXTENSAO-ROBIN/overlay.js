@@ -1,10 +1,10 @@
-"use strict";
+﻿"use strict";
 
 (() => {
-  if (globalThis.__JDARK_OVERLAY_LOADED__) return;
-  globalThis.__JDARK_OVERLAY_LOADED__ = true;
+  if (globalThis.__ROBIN_OVERLAY_LOADED__) return;
+  globalThis.__ROBIN_OVERLAY_LOADED__ = true;
 
-  const Core = globalThis.JDarkCore;
+  const Core = globalThis.RobinCore || globalThis.JDarkCore;
   const MAX_MANUAL_ITEMS = 500;
   let dashboardHost = null;
   let manualHost = null;
@@ -24,7 +24,7 @@
     if (!ctx) return;
 
     dashboardHost = document.createElement("div");
-    dashboardHost.id = "jdark-dashboard-host";
+    dashboardHost.id = "robin-dashboard-host";
     dashboardHost.style.cssText = "position:fixed;inset:0;z-index:2147483646;";
     const shadow = dashboardHost.attachShadow({ mode: "open" });
     shadow.innerHTML = `
@@ -89,8 +89,8 @@
       </style>
       <div class="backdrop">
         <div class="window">
-          <button class="close-btn" title="Fechar J-Dark">×</button>
-          <iframe title="J-Dark Painel"></iframe>
+          <button class="close-btn" title="Fechar Robin">×</button>
+          <iframe title="Robin Painel"></iframe>
         </div>
       </div>
     `;
@@ -161,30 +161,30 @@
 
   function setAnchorHighlight(anchor, isSelected) {
     if (isSelected) {
-      if (!anchor.hasAttribute("data-jdark-orig-style")) {
-        anchor.setAttribute("data-jdark-orig-style", anchor.getAttribute("style") ?? "__EMPTY__");
+      if (!anchor.hasAttribute("data-robin-orig-style")) {
+        anchor.setAttribute("data-robin-orig-style", anchor.getAttribute("style") ?? "__EMPTY__");
       }
-      anchor.setAttribute("data-jdark-selected", "true");
+      anchor.setAttribute("data-robin-selected", "true");
       anchor.style.setProperty("position", "relative", "important");
       anchor.style.setProperty("outline", "4px solid #111111", "important");
       anchor.style.setProperty("outline-offset", "-4px", "important");
       anchor.style.setProperty("box-shadow", "0 0 0 4px #ffd84d", "important");
       anchor.style.setProperty("border-radius", "14px", "important");
 
-      if (!anchor.querySelector(":scope > [data-jdark-check]")) {
+      if (!anchor.querySelector(":scope > [data-robin-check]")) {
         const badge = document.createElement("span");
-        badge.setAttribute("data-jdark-check", "true");
+        badge.setAttribute("data-robin-check", "true");
         badge.style.cssText = "position:absolute!important;inset:0!important;z-index:2147483000!important;display:flex!important;align-items:flex-start!important;justify-content:flex-end!important;padding:12px!important;background:rgba(255,216,77,0.18)!important;pointer-events:none!important;";
         badge.innerHTML = '<b style="display:grid!important;place-items:center!important;width:32px!important;height:32px!important;border-radius:50%!important;background:#ffd84d!important;color:#111111!important;border:2.5px solid #111111!important;font:900 18px/1 system-ui!important;box-shadow:3px 3px 0px #111111!important;">✓</b>';
         anchor.appendChild(badge);
       }
     } else {
-      anchor.querySelectorAll(":scope > [data-jdark-check]").forEach((el) => el.remove());
-      const orig = anchor.getAttribute("data-jdark-orig-style");
+      anchor.querySelectorAll(":scope > [data-robin-check]").forEach((el) => el.remove());
+      const orig = anchor.getAttribute("data-robin-orig-style");
       if (orig === "__EMPTY__") anchor.removeAttribute("style");
       else if (orig !== null) anchor.setAttribute("style", orig);
-      anchor.removeAttribute("data-jdark-orig-style");
-      anchor.removeAttribute("data-jdark-selected");
+      anchor.removeAttribute("data-robin-orig-style");
+      anchor.removeAttribute("data-robin-selected");
     }
   }
 
@@ -257,7 +257,7 @@
     window.removeEventListener("auxclick", onManualClickSuppressed, true);
     manualObserver?.disconnect();
     manualObserver = null;
-    document.querySelectorAll("[data-jdark-selected]").forEach((a) => setAnchorHighlight(a, false));
+    document.querySelectorAll("[data-robin-selected]").forEach((a) => setAnchorHighlight(a, false));
     manualHost?.remove();
     manualHost = null;
     selectedMap.clear();
@@ -303,7 +303,7 @@
 
     statusNotice = `Clique nas capas dos ${Core.ITEM_NOUNS[activeContext.platform] || "vídeos"} para selecionar.`;
     manualHost = document.createElement("div");
-    manualHost.id = "jdark-manual-bar";
+    manualHost.id = "robin-manual-bar";
     manualHost.style.cssText = "position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:2147483647;";
     const shadow = manualHost.attachShadow({ mode: "open" });
     shadow.innerHTML = `
@@ -389,7 +389,7 @@
       <div class="toolbar">
         <div class="badge">J</div>
         <div class="info">
-          <div class="title">SELEÇÃO MANUAL J-DARK · ${Core.PLATFORM_NAMES[activeContext.platform].toUpperCase()}</div>
+          <div class="title">SELEÇÃO MANUAL ROBIN · ${Core.PLATFORM_NAMES[activeContext.platform].toUpperCase()}</div>
           <div class="notice"></div>
         </div>
         <div class="counter"><strong class="count">0</strong>/ 500</div>
@@ -414,14 +414,14 @@
   }
 
   chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
-    if (message?.type === "JDARK_TOGGLE_OVERLAY") {
+    if (["ROBIN_TOGGLE_OVERLAY", "JDARK_TOGGLE_OVERLAY"].includes(message?.type)) {
       if (manualHost) stopManualMode();
       if (dashboardHost) closeDashboardModal();
       else openDashboardModal(message.context);
       sendResponse({ ok: true, version: "1.0.0" });
       return false;
     }
-    if (message?.type === "JDARK_START_MANUAL_SELECTION") {
+    if (["ROBIN_START_MANUAL_SELECTION", "JDARK_START_MANUAL_SELECTION"].includes(message?.type)) {
       startManualMode(message.context);
       sendResponse({ ok: true, version: "1.0.0" });
       return false;

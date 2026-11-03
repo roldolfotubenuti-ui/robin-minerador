@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 using System.Web.Script.Serialization;
 using Microsoft.Win32;
 
-namespace JDarkCompanion
+namespace RobinCompanion
 {
     public sealed class JobItemRequest
     {
@@ -69,7 +69,7 @@ namespace JDarkCompanion
         {
             id = Guid.NewGuid().ToString("N");
             status = "running";
-            stage = "Iniciando job no J-Dark Companion...";
+            stage = "Iniciando job no Robin Companion...";
             percent = 2;
             error = "";
             filenames = new List<string>();
@@ -131,7 +131,7 @@ namespace JDarkCompanion
                 {
                     if (key != null)
                     {
-                        key.SetValue("JDarkCompanion", "\"" + exePath + "\"");
+                        key.SetValue("RobinCompanion", "\"" + exePath + "\"");
                     }
                 }
             }
@@ -141,7 +141,7 @@ namespace JDarkCompanion
         private static string ResolveOutputDir()
         {
             string userProfile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-            string dir = Path.Combine(userProfile, "Downloads", "J-Dark");
+            string dir = Path.Combine(userProfile, "Downloads", "Robin");
             Directory.CreateDirectory(dir);
             return dir;
         }
@@ -200,7 +200,7 @@ namespace JDarkCompanion
                     SendJson(res, 200, new Dictionary<string, object>
                     {
                         { "ok", true },
-                        { "service", "jdark-companion" },
+                        { "service", "robin-companion" }, { "serviceAlt", "jdark-companion" },
                         { "version", "1.0.0" },
                         { "outputDir", ResolveOutputDir() },
                         { "ytDlp", File.Exists(FindResourceBinary("yt-dlp.exe")) },
@@ -211,14 +211,14 @@ namespace JDarkCompanion
 
                 if (req.HttpMethod == "GET" && (path == "/" || path == "/status"))
                 {
-                    string html = "<!doctype html><html lang='pt-BR'><head><meta charset='utf-8'><title>J-Dark Companion 1.0</title>" +
+                    string html = "<!doctype html><html lang='pt-BR'><head><meta charset='utf-8'><title>Robin Companion 1.0</title>" +
                         "<style>body{background:#090412;color:#f5eeff;font-family:Segoe UI,sans-serif;display:grid;place-items:center;height:95vh;margin:0}" +
                         ".card{background:#140a26;border:1px solid #9333ea;border-radius:18px;padding:28px;max-width:540px;box-shadow:0 20px 60px rgba(0,0,0,.7)}" +
                         "h1{margin:0 0 8px;color:#c084fc}p{color:#cbb8e2;line-height:1.5}.ok{color:#4ade80;font-weight:700}</style></head>" +
-                        "<body><div class='card'><h1>J-Dark Companion 1.0</h1>" +
+                        "<body><div class='card'><h1>Robin Companion 1.0</h1>" +
                         "<p class='ok'>● Servidor local ativo em 127.0.0.1:17832</p>" +
                         "<p>Pasta de saída: <code>" + ResolveOutputDir() + "</code></p>" +
-                        "<p>Use a extensão J-Dark no Chrome ou Edge para minerar perfis e baixar lotes em ZIP + CSV.</p></div></body></html>";
+                        "<p>Use a extensão Robin Minerador no Chrome ou Edge para minerar perfis e baixar lotes em ZIP + CSV.</p></div></body></html>";
                     byte[] buf = Encoding.UTF8.GetBytes(html);
                     res.StatusCode = 200;
                     res.ContentType = "text/html; charset=utf-8";
@@ -300,7 +300,7 @@ namespace JDarkCompanion
         private static void ExecuteDownloadJob(JobState job, CreateJobRequest req)
         {
             string outRoot = ResolveOutputDir();
-            string tempWorkDir = Path.Combine(Path.GetTempPath(), "jdark_job_" + job.id);
+            string tempWorkDir = Path.Combine(Path.GetTempPath(), "robin_job_" + job.id);
             Directory.CreateDirectory(tempWorkDir);
 
             try
@@ -367,7 +367,7 @@ namespace JDarkCompanion
                     job.percent = 92;
 
                     string dateStr = DateTime.Now.ToString("yyyy-MM-dd");
-                    string zipName = string.Format("JDark_{0}_{1}_{2}{3}.zip", safePlatform, safeProfile, dateStr, partSuffix);
+                    string zipName = string.Format("Robin_{0}_{1}_{2}{3}.zip", safePlatform, safeProfile, dateStr, partSuffix);
                     string zipFullPath = Path.Combine(outRoot, zipName);
                     if (File.Exists(zipFullPath)) File.Delete(zipFullPath);
 
@@ -384,7 +384,7 @@ namespace JDarkCompanion
                 else
                 {
                     job.status = "complete";
-                    job.stage = "Concluído — salvo em Downloads\\J-Dark";
+                    job.stage = "Concluído — salvo em Downloads\\Robin";
                     job.percent = 100;
                 }
             }

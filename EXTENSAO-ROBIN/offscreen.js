@@ -1,7 +1,7 @@
-"use strict";
+﻿"use strict";
 
 (() => {
-  const Core = globalThis.JDarkCore;
+  const Core = globalThis.RobinCore || globalThis.JDarkCore;
   const IG_APP_ID = "936619743392459";
   const MAX_VIDEO_BYTES = 300 * 1024 * 1024;
   const MAX_ZIP_PART_BYTES = 1.2 * 1024 * 1024 * 1024;
@@ -73,7 +73,7 @@
   async function fetchItemBytes(reel, job) {
     if (reel.demo) {
       const demoContent = [
-        "J-Dark — Arquivo de Demonstração",
+        "Robin Minerador — Arquivo de Demonstração",
         `Plataforma: ${job.platform}`,
         `Perfil: @${job.profile}`,
         `Código: ${reel.shortcode}`,
@@ -93,7 +93,7 @@
       }
     }
     if (!mediaUrl) {
-      throw new Error("URL direta do vídeo não liberada pela plataforma (inicie o J-Dark Companion para TikTok/YouTube).");
+      throw new Error("URL direta do vídeo não liberada pela plataforma (inicie o Robin Companion para TikTok/YouTube).");
     }
     return await downloadBinaryBytes(mediaUrl);
   }
@@ -112,7 +112,7 @@
   }
 
   async function processBatchPart({ chunk, partIndex, totalParts, baseOffset, job, includeCsv, counters }) {
-    const archive = new Core.JDarkZipArchive();
+    const archive = new (Core.RobinZipArchive || Core.JDarkZipArchive)();
     const completedReels = new Array(chunk.length);
     const partFailures = [];
     const safeProfile = Core.sanitizeSlug(job.profile, "perfil");
@@ -180,7 +180,7 @@
     });
 
     const dateStr = new Date().toISOString().slice(0, 10);
-    const zipFilename = `J-Dark/JDark_${Core.sanitizeSlug(job.platform)}_${safeProfile}_${dateStr}${partSuffix}.zip`;
+    const zipFilename = `Robin/Robin_${Core.sanitizeSlug(job.platform)}_${safeProfile}_${dateStr}${partSuffix}.zip`;
     await sendBlobToBackground(archive.toBlob(), zipFilename, succeeded.map((r) => r.shortcode), {
       ...job,
       part: partIndex + 1,

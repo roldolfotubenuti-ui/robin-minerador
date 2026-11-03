@@ -1,4 +1,4 @@
-# 🚀 Robin - Minerador de Vídeos Virais
+# 🚀 Robin Minerador - Minerador de Vídeos Virais
 
 O **Robin Minerador** é uma ferramenta para analisar métricas de engajamento, calcular potencial viral e baixar vídeos em alta definição em massa do **Instagram Reels**, **TikTok** e **YouTube Shorts**.
 
@@ -7,7 +7,7 @@ O **Robin Minerador** é uma ferramenta para analisar métricas de engajamento, 
 ## 📦 O que está incluído?
 
 1. **`COMPANION-WINDOWS`**: Servidor local nativo para Windows (64 bits) com `yt-dlp` e `ffmpeg` integrados. Cuida do processamento, download em alta qualidade, conversão e compactação em `.zip`.
-2. **`EXTENSAO-JDARK`**: Extensão para Google Chrome, Microsoft Edge, Brave, Opera e outros navegadores Chromium (Manifest V3).
+2. **`EXTENSAO-ROBIN`**: Extensão para Google Chrome, Microsoft Edge, Brave, Opera e outros navegadores Chromium (Manifest V3).
 
 ---
 
@@ -21,7 +21,7 @@ O **Robin Minerador** é uma ferramenta para analisar métricas de engajamento, 
 
 ### 2️⃣ Instalar o Companion (Servidor de Download)
 1. Entre na pasta **`COMPANION-WINDOWS`**.
-2. Dê dois cliques em **`INSTALAR-JDARK-WINDOWS.bat`** (ou execute diretamente o **`J-Dark Companion.exe`**).
+2. Dê dois cliques em **`INSTALAR-ROBIN-WINDOWS.bat`** (ou execute diretamente o **`Robin Companion.exe`**).
 3. Uma mensagem confirmará que a instalação foi concluída e o servidor já está rodando em segundo plano.
 
 ---
@@ -33,7 +33,7 @@ O **Robin Minerador** é uma ferramenta para analisar métricas de engajamento, 
    - No Brave: `brave://extensions`
 2. No canto superior direito da tela de extensões, **ative a chave "Modo do desenvolvedor"** (*Developer mode*).
 3. Clique no botão **"Carregar sem compactação"** (*Load unpacked*).
-4. Selecione a pasta **`EXTENSAO-JDARK`** dentro da pasta que você extraiu.
+4. Selecione a pasta **`EXTENSAO-ROBIN`** dentro da pasta que você extraiu.
 5. Pronto! O ícone do Robin Minerador aparecerá na barra de extensões do navegador.
 
 ---
@@ -41,6 +41,7 @@ O **Robin Minerador** é uma ferramenta para analisar métricas de engajamento, 
 ## 🎯 Como Usar
 1. Acesse o perfil ou aba de vídeos de qualquer conta no **Instagram Reels**, **TikTok** ou **YouTube Shorts**.
 2. Clique no ícone da extensão **Robin Minerador** no seu navegador.
-3. Certifique-se de que o status indica **Companion: Online**.
-4. Defina os filtros (mínimo de visualizações, engajamento, etc.) ou selecione os vídeos desejados.
-5. Clique em minerar/baixar. Os arquivos e relatórios serão salvos automaticamente na sua pasta **Downloads**.
+3. Faça login com suas credenciais de usuário ou de administrador master.
+4. Certifique-se de que o status indica **Companion: Online**.
+5. Defina os filtros (mínimo de visualizações, engajamento, etc.) ou selecione os vídeos desejados.
+6. Clique em minerar/baixar. Os arquivos e relatórios serão salvos automaticamente na sua pasta **Downloads\Robin**.

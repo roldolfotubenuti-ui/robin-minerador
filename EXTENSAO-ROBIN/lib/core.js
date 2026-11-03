@@ -1,7 +1,7 @@
-"use strict";
+﻿"use strict";
 
 (() => {
-  if (globalThis.JDarkCore) return;
+  if (globalThis.RobinCore) return;
 
   const PLATFORM_NAMES = {
     instagram: "Instagram",
@@ -289,7 +289,7 @@
     return (crc ^ 0xffffffff) >>> 0;
   }
 
-  class JDarkZipArchive {
+  class RobinZipArchive {
     constructor() {
       this.files = [];
       this.encoder = new TextEncoder();

@@ -1,11 +1,11 @@
-"use strict";
+﻿"use strict";
 
 importScripts("lib/core.js", "lib/supabase-auth.js");
 
-const Core = globalThis.JDarkCore;
+const Core = globalThis.RobinCore || globalThis.JDarkCore;
 const Auth = globalThis.RobinAuth;
 const COMPANION_BASE_URL = "http://127.0.0.1:17832";
-const COMPANION_POLL_ALARM = "jdark-companion-poll";
+const COMPANION_POLL_ALARM = "robin-companion-poll";
 
 /**
  * Validação Zero-Trust de Assinatura no Servidor
@@ -18,10 +18,10 @@ async function assertActiveSubscription() {
 
   const verification = await globalThis.RobinAuth.verifyLicenseWithServer();
   if (!verification || !verification.authorized) {
-    const errorMsg = verification?.error || "Assinatura ativa na Cakto é obrigatória para usar o Robin.";
+    const errorMsg = verification?.error || "Conta inativa ou não autenticada. Acesso bloqueado.";
     const err = new Error(errorMsg);
     err.code = verification?.code || "UNAUTHORIZED";
-    err.checkoutUrl = verification?.checkout_url || "https://pay.cakto.com.br/qw6ns6o_1234667";
+    err.checkoutUrl = null;
     throw err;
   }
   return verification;
@@ -52,7 +52,7 @@ async function checkCompanionStatus() {
     });
     const data = await res.json().catch(() => ({}));
     return {
-      ok: Boolean(res.ok && data?.ok && ["jdark-companion", "viralbox-companion"].includes(data?.service)),
+      ok: Boolean(res.ok && data?.ok && ["robin-companion", "jdark-companion", "viralbox-companion"].includes(data?.service)),
       ...data
     };
   } catch (err) {
@@ -64,7 +64,7 @@ async function checkCompanionStatus() {
 
 async function injectPlatformScriptsIfNeeded(tabId, platform) {
   try {
-    const probe = await chrome.tabs.sendMessage(tabId, { type: "JDARK_DETECT_CONTEXT" });
+    const probe = await chrome.tabs.sendMessage(tabId, { type: "ROBIN_DETECT_CONTEXT" });
     if (probe?.version) return probe;
   } catch (_) {}
 
@@ -75,7 +75,7 @@ async function injectPlatformScriptsIfNeeded(tabId, platform) {
   };
   const files = filesByPlatform[platform] || filesByPlatform.instagram;
   await chrome.scripting.executeScript({ target: { tabId }, files });
-  return await chrome.tabs.sendMessage(tabId, { type: "JDARK_DETECT_CONTEXT" });
+  return await chrome.tabs.sendMessage(tabId, { type: "ROBIN_DETECT_CONTEXT" });
 }
 
 async function handleStartAnalysis(message) {
@@ -112,13 +112,13 @@ async function handleStartAnalysis(message) {
     sort,
     scope,
     filters,
-    stage: "Iniciando varredura J-Dark...",
+    stage: "Iniciando varredura Robin...",
     percent: 4,
     updatedAt: Date.now()
   });
 
   const resp = await chrome.tabs.sendMessage(tabId, {
-    type: "JDARK_ANALYZE_PROFILE",
+    type: "ROBIN_ANALYZE_PROFILE",
     platform,
     key,
     profile,
@@ -193,7 +193,7 @@ async function recordDownloadedShortcodes(key, shortcodes = []) {
 async function startCompanionJob(job, reels, includeCsv) {
   const health = await checkCompanionStatus();
   if (!health.ok) {
-    throw new Error("O J-Dark Companion não está aberto em 127.0.0.1:17832. Abra o J-Dark Companion para baixar vídeos do TikTok ou YouTube Shorts.");
+    throw new Error("O Robin Companion não está aberto em 127.0.0.1:17832. Abra o Robin Companion para baixar vídeos do TikTok ou YouTube Shorts.");
   }
 
   const res = await fetch(`${COMPANION_BASE_URL}/jobs`, {
@@ -223,7 +223,7 @@ async function startCompanionJob(job, reels, includeCsv) {
 
   const data = await res.json().catch(() => ({}));
   if (!res.ok || !data?.ok || !data?.job?.id) {
-    throw new Error(data?.error || `O J-Dark Companion recusou a tarefa (HTTP ${res.status}).`);
+    throw new Error(data?.error || `O Robin Companion recusou a tarefa (HTTP ${res.status}).`);
   }
 
   const nextJob = {
@@ -330,7 +330,7 @@ async function handleStartDownload(message) {
   if (!isDemo && Number(message.tabId) && reels.some((r) => !r.videoUrl)) {
     try {
       const resolved = await chrome.tabs.sendMessage(Number(message.tabId), {
-        type: "JDARK_RESOLVE_MEDIA",
+        type: "ROBIN_RESOLVE_MEDIA",
         profile,
         reels
       });
@@ -540,7 +540,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         }
         try {
           const resolved = await chrome.tabs.sendMessage(tabId, {
-            type: "JDARK_RESOLVE_MEDIA",
+            type: "ROBIN_RESOLVE_MEDIA",
             profile: message.profile,
             reels: message.reels || []
           });

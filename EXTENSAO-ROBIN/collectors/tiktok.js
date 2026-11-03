@@ -1,10 +1,10 @@
-"use strict";
+﻿"use strict";
 
 (() => {
-  if (globalThis.__JDARK_TIKTOK_COLLECTOR_LOADED__) return;
-  globalThis.__JDARK_TIKTOK_COLLECTOR_LOADED__ = true;
+  if (globalThis.__ROBIN_TIKTOK_COLLECTOR_LOADED__) return;
+  globalThis.__ROBIN_TIKTOK_COLLECTOR_LOADED__ = true;
 
-  const Core = globalThis.JDarkCore;
+  const Core = globalThis.RobinCore || globalThis.JDarkCore;
   let isScanning = false;
 
   function reportProgress(profile, count, limit, stage, percent) {
@@ -238,13 +238,13 @@
 
   chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     (async () => {
-      if (message?.type === "JDARK_DETECT_CONTEXT") {
+      if (["ROBIN_DETECT_CONTEXT", "JDARK_DETECT_CONTEXT"].includes(message?.type)) {
         const ctx = Core.detectPlatformContext(location.href);
         sendResponse({ ...(ctx || {}), url: location.href, version: "1.0.0" });
         return;
       }
 
-      if (message?.type === "JDARK_ANALYZE_PROFILE") {
+      if (["ROBIN_ANALYZE_PROFILE", "JDARK_ANALYZE_PROFILE"].includes(message?.type)) {
         if (isScanning) {
           sendResponse({ started: false, error: "Já existe uma análise em andamento." });
           return;
@@ -267,13 +267,13 @@
         return;
       }
 
-      if (message?.type === "JDARK_RESOLVE_MEDIA") {
+      if (["ROBIN_RESOLVE_MEDIA", "JDARK_RESOLVE_MEDIA"].includes(message?.type)) {
         const resolved = await resolveTikTokDetails(String(message.profile || ""), (message.reels || []).slice(0, 500));
         sendResponse({ ok: true, reels: resolved });
         return;
       }
 
-      if (message?.type === "JDARK_SIMILAR_PROFILES") {
+      if (["ROBIN_SIMILAR_PROFILES", "JDARK_SIMILAR_PROFILES"].includes(message?.type)) {
         sendResponse({ ok: true, profiles: findSimilarTikTokCreators(String(message.profile || "")) });
       }
     })().catch((err) => sendResponse({ ok: false, error: err.message }));

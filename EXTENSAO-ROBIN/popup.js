@@ -53,7 +53,7 @@
     };
   }
 
-  const Core = globalThis.JDarkCore;
+  const Core = globalThis.RobinCore || globalThis.JDarkCore;
   const $ = (sel) => document.querySelector(sel);
   const urlParams = new URLSearchParams(location.search);
   const isEmbedded = urlParams.get("embedded") === "1";
@@ -89,118 +89,110 @@
     }
   };
 
-  let currentAuthMode = "signin"; // "signin" | "signup" | "recovery"
+  let allAdminUsers = [];
+  let heartbeatTimer = null;
 
-  function setAuthMode(mode) {
-    currentAuthMode = mode;
-    const titleEl = $("#auth-title");
-    const subtitleEl = $("#auth-subtitle");
-    const passField = $("#auth-password-field");
-    const optionsRow = $("#auth-options-row");
-    const submitBtn = $("#btn-login");
-    const footerText = $("#auth-footer-text");
-    const tabLogin = $("#tab-auth-login");
-    const tabSignup = $("#tab-auth-signup");
-    const alertEl = $("#auth-alert");
-    if (alertEl) alertEl.classList.add("hidden");
+  function escapeHtml(str) {
+    return String(str || "").replace(/[&<>"']/g, (m) => ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;"
+    }[m]));
+  }
 
-    if (tabLogin && tabSignup) {
-      tabLogin.classList.toggle("active", mode === "signin");
-      tabSignup.classList.toggle("active", mode === "signup");
-    }
+  function startSessionHeartbeat() {
+    if (heartbeatTimer) clearInterval(heartbeatTimer);
+    heartbeatTimer = setInterval(async () => {
+      try {
+        const { user, token } = await globalThis.RobinAuth.getStoredSession();
+        if (!user || !token) return;
+        const res = await globalThis.RobinAuth.checkSession();
+        if (!res.authorized || res.code === "USER_INACTIVE" || res.code === "USER_EXPIRED") {
+          stopSessionHeartbeat();
+          await handleLogout();
+          showAuthAlert(res.error || "Sua conta foi inativada ou expirou. Acesso bloqueado.", "error");
+        }
+      } catch (_) {}
+    }, 20000);
+  }
 
-    if (mode === "signin") {
-      if (titleEl) titleEl.textContent = "WELCOME BACK";
-      if (subtitleEl) subtitleEl.textContent = "Enter your email and password to access your account";
-      if (passField) passField.classList.remove("hidden");
-      if (optionsRow) optionsRow.classList.remove("hidden");
-      $("#auth-recovery-container")?.classList.add("hidden");
-      if (submitBtn) {
-        submitBtn.classList.remove("hidden");
-        submitBtn.textContent = "Sign In";
-      }
-      if (footerText) {
-        footerText.innerHTML = `Don't have an account? <a href="#" id="link-toggle-signup">Sign up</a>`;
-        $("#link-toggle-signup")?.addEventListener("click", (e) => {
-          e.preventDefault();
-          setAuthMode("signup");
-        });
-      }
-    } else if (mode === "signup") {
-      if (titleEl) titleEl.textContent = "CREATE ACCOUNT";
-      if (subtitleEl) subtitleEl.textContent = "Register with the email used in your Cakto subscription";
-      if (passField) passField.classList.remove("hidden");
-      if (optionsRow) optionsRow.classList.add("hidden");
-      $("#auth-recovery-container")?.classList.add("hidden");
-      if (submitBtn) {
-        submitBtn.classList.remove("hidden");
-        submitBtn.textContent = "Create Account";
-      }
-      if (footerText) {
-        footerText.innerHTML = `Already have an account? <a href="#" id="link-toggle-signin">Sign in</a>`;
-        $("#link-toggle-signin")?.addEventListener("click", (e) => {
-          e.preventDefault();
-          setAuthMode("signin");
-        });
-      }
-    } else if (mode === "recovery") {
-      if (titleEl) titleEl.textContent = "RESET PASSWORD";
-      if (subtitleEl) subtitleEl.textContent = "Enter your email to receive a recovery code (OTP)";
-      if (passField) passField.classList.add("hidden");
-      if (optionsRow) optionsRow.classList.add("hidden");
-      $("#auth-recovery-container")?.classList.remove("hidden");
-      $("#auth-otp-field")?.classList.add("hidden");
-      $("#auth-new-password-field")?.classList.add("hidden");
-      if (submitBtn) submitBtn.classList.add("hidden"); // Oculto até enviar o código
-
-      if (footerText) {
-        footerText.innerHTML = `Remembered your password? <a href="#" id="link-toggle-back-signin">Back to Sign in</a>`;
-        $("#link-toggle-back-signin")?.addEventListener("click", (e) => {
-          e.preventDefault();
-          setAuthMode("signin");
-        });
-      }
+  function stopSessionHeartbeat() {
+    if (heartbeatTimer) {
+      clearInterval(heartbeatTimer);
+      heartbeatTimer = null;
     }
   }
 
-  function updateAuthUI(licenseData) {
+  function updateAuthUI(authData) {
     const authScreen = $("#auth-screen");
     const appShell = $("#app-shell");
     const emailDisplay = $("#account-email-display");
+    const roleDisplay = $("#account-role-display");
+    const limitsDisplay = $("#account-limits-display");
+    const expiresDisplay = $("#account-expires-display");
     const statusBadge = $("#account-status-badge");
+    const adminNavTab = $("#tab-nav-admin");
 
-    if (licenseData?.authorized) {
+    if (authData?.authorized) {
       authScreen.classList.add("hidden");
       appShell.classList.remove("hidden");
-      if (emailDisplay) emailDisplay.textContent = licenseData.email || "assinante@robinpro.com";
+
+      const user = authData.user || {};
+      const email = authData.email || user.email || "usuario@robin.ia";
+      const isAdmin = (authData.role || user.role) === "admin";
+
+      if (emailDisplay) emailDisplay.textContent = email;
+      if (roleDisplay) roleDisplay.textContent = `Perfil: ${isAdmin ? "Administrador Master" : "Usuário Comum"}`;
       if (statusBadge) {
-        if (licenseData.status === "canceled") {
-          statusBadge.textContent = "CANCELADA (ACESSO ATÉ VENCIMENTO)";
-          statusBadge.className = "ready-pill account-active-pill";
+        statusBadge.textContent = "CONTA ATIVA";
+        statusBadge.className = "ready-pill account-active-pill";
+      }
+
+      if (limitsDisplay) {
+        const dLimit = user.max_downloads_per_day === 0 ? "Ilimitados" : `${user.max_downloads_per_day || 50}/dia`;
+        const sLimit = user.max_scrapes_per_day === 0 ? "Ilimitadas" : `${user.max_scrapes_per_day || 100}/dia`;
+        limitsDisplay.textContent = `Downloads: ${dLimit} · Varreduras: ${sLimit}`;
+      }
+
+      if (expiresDisplay) {
+        const exp = authData.expiresAt || user.expires_at;
+        if (!exp || isAdmin) {
+          expiresDisplay.textContent = "Assinatura: Acesso Vitalício / Master";
+          expiresDisplay.className = "account-expires-text badge-exp-lifetime";
         } else {
-          statusBadge.textContent = "PAGAMENTO ATIVO (CAKTO)";
-          statusBadge.className = "ready-pill account-active-pill";
+          const expDate = new Date(exp);
+          const diffDays = Math.ceil((expDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+          const dateStr = expDate.toLocaleDateString("pt-BR");
+          if (diffDays <= 0) {
+            expiresDisplay.textContent = `Assinatura: Expirada em ${dateStr}`;
+            expiresDisplay.className = "account-expires-text badge-exp-expired";
+          } else {
+            expiresDisplay.textContent = `Assinatura: Vence em ${diffDays} dias (${dateStr})`;
+            expiresDisplay.className = "account-expires-text badge-exp-active";
+          }
         }
       }
+
+      if (isAdmin) {
+        adminNavTab?.classList.remove("hidden");
+        loadAndRenderAdminUsers();
+      } else {
+        adminNavTab?.classList.add("hidden");
+        const activeTab = document.querySelector(".nav-tab.active");
+        if (activeTab?.dataset.tab === "admin") {
+          switchTab("miner");
+        }
+      }
+
+      startSessionHeartbeat();
     } else {
+      stopSessionHeartbeat();
       authScreen.classList.remove("hidden");
       appShell.classList.add("hidden");
+      adminNavTab?.classList.add("hidden");
     }
-  }
-
-  function showAuthError404() {
-    const errorView = $("#auth-error-view");
-    const mainCard = $("#auth-main-card");
-    if (!errorView) return;
-    if (mainCard) mainCard.classList.add("hidden");
-    errorView.classList.remove("hidden");
-  }
-
-  function hideAuthError404() {
-    const errorView = $("#auth-error-view");
-    const mainCard = $("#auth-main-card");
-    if (errorView) errorView.classList.add("hidden");
-    if (mainCard) mainCard.classList.remove("hidden");
   }
 
   function showAuthAlert(msg, type = "error") {
@@ -211,76 +203,42 @@
     alertEl.classList.remove("hidden");
   }
 
-  async function handleRequestOtp() {
-    const email = $("#auth-email")?.value;
-    const btn = $("#btn-request-otp");
-    if (!email) {
-      showAuthAlert("Informe seu e-mail para receber o código.", "error");
-      return;
-    }
-
-    if (btn) {
-      btn.disabled = true;
-      btn.textContent = "Enviando código...";
-    }
-
-    try {
-      await globalThis.RobinAuth.resetPassword(email);
-      showAuthAlert("Código OTP enviado para seu e-mail! Insira o código de 6 dígitos e sua nova senha abaixo.", "info");
-      $("#auth-otp-field")?.classList.remove("hidden");
-      $("#auth-new-password-field")?.classList.remove("hidden");
-      const submitBtn = $("#btn-login");
-      if (submitBtn) {
-        submitBtn.classList.remove("hidden");
-        submitBtn.textContent = "Confirmar e Redefinir Senha";
-      }
-      if (btn) btn.textContent = "Reenviar Código";
-    } catch (err) {
-      showAuthAlert(err.message || "Erro ao solicitar código de recuperação.", "error");
-    } finally {
-      if (btn) btn.disabled = false;
-    }
-  }
-
   async function handleAuthSubmit() {
-    const email = $("#auth-email")?.value;
-    const password = $("#auth-password")?.value;
+    const emailInput = $("#auth-email");
+    const passInput = $("#auth-password");
+    const rememberCheckbox = $("#auth-remember");
+    const email = emailInput?.value;
+    const password = passInput?.value;
     const btn = $("#btn-login");
-    const originalText = btn ? btn.textContent : "Submit";
+    const originalText = btn ? btn.textContent : "Entrar";
 
     if (btn) {
       btn.disabled = true;
-      btn.textContent = "Carregando...";
+      btn.textContent = "Autenticando...";
     }
     const alertEl = $("#auth-alert");
     if (alertEl) alertEl.classList.add("hidden");
 
     try {
-      if (currentAuthMode === "signin") {
-        await globalThis.RobinAuth.signIn(email, password);
-        const verification = await globalThis.RobinAuth.verifyLicenseWithServer();
+      if (rememberCheckbox?.checked && email) {
+        await chrome.storage.local.set({ robin_remember_email: email });
+      } else {
+        await chrome.storage.local.remove("robin_remember_email");
+      }
 
-        if (verification && verification.authorized) {
-          hideAuthError404();
-          updateAuthUI({ ...verification, email });
-          showToast("Acesso liberado! Assinatura Cakto confirmada.");
-        } else {
-          showAuthError404();
-        }
-      } else if (currentAuthMode === "signup") {
-        const result = await globalThis.RobinAuth.signUp(email, password);
-        showAuthAlert(result.message, "success");
-        $("#auth-password").value = "";
-        setAuthMode("signin");
-      } else if (currentAuthMode === "recovery") {
-        const otpCode = $("#auth-otp-code")?.value;
-        const newPassword = $("#auth-new-password")?.value;
-        const result = await globalThis.RobinAuth.verifyOtpAndResetPassword(email, otpCode, newPassword);
-        showAuthAlert(result.message, "success");
-        setTimeout(() => setAuthMode("signin"), 3000);
+      await globalThis.RobinAuth.signIn(email, password);
+      const check = await globalThis.RobinAuth.checkSession();
+
+      if (check && check.authorized) {
+        updateAuthUI(check);
+        showToast("Login realizado com sucesso! Bem-vindo(a).");
+      } else if (check?.code === "USER_INACTIVE" || check?.code === "USER_EXPIRED") {
+        showAuthAlert(check?.error || "Esta conta foi inativada ou expirou. Contate o administrador.", "error");
+      } else {
+        showAuthAlert(check?.error || "E-mail ou senha incorretos.", "error");
       }
     } catch (err) {
-      showAuthAlert(err.message || "Erro durante a autenticação.", "error");
+      showAuthAlert(err.message || "Erro durante o login.", "error");
     } finally {
       if (btn) {
         btn.disabled = false;
@@ -289,15 +247,98 @@
     }
   }
 
-
   async function handleLogout() {
+    stopSessionHeartbeat();
     try {
       await globalThis.RobinAuth.signOut();
     } catch (_) {}
-    $("#auth-password").value = "";
-    hideAuthError404();
+    if ($("#auth-password")) $("#auth-password").value = "";
     updateAuthUI(null);
     showToast("Você saiu da conta.");
+  }
+
+  /* ==========================================================================
+     Painel de Administração Master
+     ========================================================================== */
+
+  function switchAdminSubtab(subtabId) {
+    document.querySelectorAll(".admin-subtab-btn").forEach((btn) => {
+      btn.classList.toggle("active", btn.dataset.subtab === subtabId);
+    });
+    document.querySelectorAll(".admin-subtab-panel").forEach((panel) => {
+      panel.classList.toggle("active", panel.id === `admin-subtab-${subtabId}`);
+    });
+    if (subtabId === "users-list") {
+      loadAndRenderAdminUsers();
+    }
+  }
+
+  async function loadAndRenderAdminUsers() {
+    const tbody = $("#admin-users-tbody");
+    const countEl = $("#admin-user-count");
+    if (!tbody) return;
+    try {
+      tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding: 18px; color: var(--text-muted);">Consultando banco de dados...</td></tr>`;
+      allAdminUsers = await globalThis.RobinAuth.adminListUsers();
+      if (countEl) countEl.textContent = String(allAdminUsers.length);
+      renderFilteredAdminUsers();
+    } catch (err) {
+      tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding: 18px; color: #ef4444;">Erro ao carregar usuários: ${escapeHtml(err.message)}</td></tr>`;
+    }
+  }
+
+  function renderFilteredAdminUsers() {
+    const tbody = $("#admin-users-tbody");
+    if (!tbody) return;
+    const search = String($("#admin-search-users")?.value || "").toLowerCase().trim();
+    const filtered = allAdminUsers.filter((u) => !search || u.email.toLowerCase().includes(search));
+
+    if (filtered.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding: 18px; color: var(--text-muted);">Nenhum usuário cadastrado encontrado.</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = filtered.map((u) => {
+      const isActive = u.status === "active";
+      const isAdmin = u.role === "admin";
+      const downloadsText = u.max_downloads_per_day === 0 ? "Ilimitado" : `${u.max_downloads_per_day}/dia`;
+      const scrapesText = u.max_scrapes_per_day === 0 ? "Ilimitado" : `${u.max_scrapes_per_day}/dia`;
+
+      let validityHtml = "";
+      if (!u.expires_at || u.days_left === -1) {
+        validityHtml = '<span class="badge-exp-lifetime">Vitalício</span>';
+      } else {
+        const d = new Date(u.expires_at);
+        const dateStr = d.toLocaleDateString("pt-BR");
+        if (u.days_left === 0 || d < new Date()) {
+          validityHtml = `<span class="badge-exp-expired">Expirado (${dateStr})</span>`;
+        } else {
+          validityHtml = `<span class="badge-exp-active">${u.days_left} dias (${dateStr})`;
+        }
+      }
+
+      return `
+        <tr>
+          <td><strong>${escapeHtml(u.email)}</strong></td>
+          <td><span class="badge-role-${u.role}">${isAdmin ? "Master" : "Comum"}</span></td>
+          <td><span class="badge-status-${u.status}">${isActive ? "Ativo" : "Inativo"}</span></td>
+          <td>${validityHtml}</td>
+          <td><small>Downloads: ${downloadsText} · Varreduras: ${scrapesText}</small></td>
+          <td style="text-align: right; white-space: nowrap;">
+            ${!isAdmin ? `<button type="button" class="btn-table-action btn-table-add-days" data-user-action="add-days" data-id="${u.id}" data-email="${escapeHtml(u.email)}" title="Adicionar +30 dias de assinatura">+30 Dias</button>` : ""}
+            <button type="button" class="btn-table-action ${isActive ? "btn-table-toggle-deactivate" : "btn-table-toggle-activate"}" data-user-action="toggle-status" data-id="${u.id}" data-current="${u.status}">
+              ${isActive ? "Inativar" : "Ativar"}
+            </button>
+            <button type="button" class="btn-table-action btn-table-edit" data-user-action="edit" data-id="${u.id}">
+              Editar
+            </button>
+            <button type="button" class="btn-table-action btn-table-delete" data-user-action="delete" data-id="${u.id}" data-email="${escapeHtml(u.email)}">
+              Excluir
+            </button>
+          </td>
+        </tr>
+      `;
+    }).join("");
   }
 
   // Fallback for <dialog closedby="any"> on browsers without native closedBy support
@@ -450,7 +491,7 @@
 
       const thumbHtml = reel.thumbnail
         ? `<img src="${reel.thumbnail}" alt="${reel.shortcode}" loading="lazy" />`
-        : `<div style="height:100%;display:grid;place-items:center;color:#a855f7;font-weight:800;">J-DARK · ${reel.shortcode}</div>`;
+        : `<div style="height:100%;display:grid;place-items:center;color:#a855f7;font-weight:800;">ROBIN · ${reel.shortcode}</div>`;
 
       card.innerHTML = `
         <div class="reel-thumb-wrap">
@@ -606,7 +647,7 @@
     }
     try {
       await chrome.tabs.sendMessage(state.tabId, {
-        type: "JDARK_START_MANUAL_SELECTION",
+        type: "ROBIN_START_MANUAL_SELECTION",
         context: {
           platform: state.platform,
           profile: state.profile,
@@ -661,7 +702,7 @@
       total: chosen.length,
       completed: 0,
       percent: 3,
-      stage: "Iniciando empacotamento J-Dark..."
+      stage: "Iniciando empacotamento Robin..."
     });
 
     const resp = await chrome.runtime.sendMessage({
@@ -704,7 +745,7 @@
 
     try {
       const resp = await chrome.tabs.sendMessage(state.tabId, {
-        type: "JDARK_SIMILAR_PROFILES",
+        type: "ROBIN_SIMILAR_PROFILES",
         profile: state.profile
       });
       const profiles = resp?.profiles || [];
@@ -814,33 +855,179 @@
       await detectActiveTabContext();
     });
 
-    // Eventos de Autenticação / Licença Cakto
+    // Eventos de Autenticação e Deslogar
     $("#auth-form")?.addEventListener("submit", (e) => {
       e.preventDefault();
       handleAuthSubmit();
     });
 
-    $("#tab-auth-login")?.addEventListener("click", () => setAuthMode("signin"));
-    $("#tab-auth-signup")?.addEventListener("click", () => setAuthMode("signup"));
-    $("#link-toggle-signup")?.addEventListener("click", (e) => {
-      e.preventDefault();
-      setAuthMode("signup");
-    });
-
-    $("#auth-forgot-password")?.addEventListener("click", (e) => {
-      e.preventDefault();
-      setAuthMode("recovery");
-    });
-
-    $("#btn-request-otp")?.addEventListener("click", handleRequestOtp);
-
-    $("#btn-error-retry")?.addEventListener("click", () => {
-
-      hideAuthError404();
-      $("#auth-email")?.focus();
-    });
-
+    $("#btn-header-logout")?.addEventListener("click", handleLogout);
     $("#btn-logout")?.addEventListener("click", handleLogout);
+
+    // Eventos do Painel de Administração
+    $("#btn-refresh-users")?.addEventListener("click", loadAndRenderAdminUsers);
+    $("#admin-search-users")?.addEventListener("input", renderFilteredAdminUsers);
+
+    document.querySelectorAll(".admin-subtab-btn").forEach((btn) => {
+      btn.addEventListener("click", () => switchAdminSubtab(btn.dataset.subtab));
+    });
+
+    $("#admin-users-tbody")?.addEventListener("click", async (e) => {
+      const btn = e.target.closest("button[data-user-action]");
+      if (!btn) return;
+      const action = btn.dataset.userAction;
+      const id = btn.dataset.id;
+
+      if (action === "add-days") {
+        const email = btn.dataset.email;
+        if (!confirm(`Deseja adicionar +30 dias de assinatura para ${email}?`)) return;
+        try {
+          btn.disabled = true;
+          const res = await globalThis.RobinAuth.adminAddDays(id, 30);
+          showToast(res?.message || "Adicionados +30 dias com sucesso!");
+          await loadAndRenderAdminUsers();
+        } catch (err) {
+          showToast(err.message, true);
+        } finally {
+          btn.disabled = false;
+        }
+        return;
+      }
+
+      if (action === "toggle-status") {
+        const current = btn.dataset.current;
+        const newStatus = current === "active" ? "inactive" : "active";
+        if (newStatus === "inactive" && !confirm("Deseja realmente inativar este usuário? O acesso dele será bloqueado imediatamente.")) return;
+        try {
+          btn.disabled = true;
+          await globalThis.RobinAuth.adminToggleUserStatus(id, newStatus);
+          showToast(`Usuário ${newStatus === "active" ? "ativado" : "inativado"} com sucesso!`);
+          await loadAndRenderAdminUsers();
+        } catch (err) {
+          showToast(err.message, true);
+        } finally {
+          btn.disabled = false;
+        }
+      } else if (action === "edit") {
+        const user = allAdminUsers.find((u) => u.id === id);
+        if (!user) return;
+        $("#edit-user-id").value = user.id;
+        $("#edit-user-email").value = user.email;
+        $("#edit-user-password").value = "";
+        $("#edit-user-role").value = user.role;
+        $("#edit-user-downloads").value = user.max_downloads_per_day || 0;
+        $("#edit-user-scrapes").value = user.max_scrapes_per_day || 0;
+        const dialog = $("#edit-user-dialog");
+        if (dialog?.showModal) dialog.showModal();
+        else dialog.setAttribute("open", "");
+      } else if (action === "delete") {
+        const email = btn.dataset.email;
+        if (!confirm(`Tem certeza que deseja excluir o usuário ${email}? Esta ação é irreversível.`)) return;
+        try {
+          btn.disabled = true;
+          await globalThis.RobinAuth.adminDeleteUser(id);
+          showToast("Usuário excluído com sucesso!");
+          await loadAndRenderAdminUsers();
+        } catch (err) {
+          showToast(err.message, true);
+        } finally {
+          btn.disabled = false;
+        }
+      }
+    });
+
+    $("#form-create-user")?.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = $("#create-user-email").value;
+      const password = $("#create-user-password").value;
+      const role = $("#create-user-role").value;
+      const maxDownloads = $("#create-user-downloads").value;
+      const maxScrapes = $("#create-user-scrapes").value;
+      const daysActive = $("#create-user-days")?.value || 30;
+      const submitBtn = $("#btn-submit-create-user");
+
+      try {
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Salvando...";
+        await globalThis.RobinAuth.adminCreateUser(email, password, role, maxDownloads, maxScrapes, daysActive);
+        showToast("Usuário cadastrado com sucesso!");
+        $("#form-create-user").reset();
+        switchAdminSubtab("users-list");
+      } catch (err) {
+        showToast(err.message, true);
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Salvar e Criar Usuário";
+      }
+    });
+
+    $("#form-edit-user")?.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const id = $("#edit-user-id").value;
+      const email = $("#edit-user-email").value;
+      const password = $("#edit-user-password").value;
+      const role = $("#edit-user-role").value;
+      const maxDownloads = $("#edit-user-downloads").value;
+      const maxScrapes = $("#edit-user-scrapes").value;
+      const submitBtn = $("#btn-save-edit-user");
+
+      try {
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Salvando...";
+        await globalThis.RobinAuth.adminUpdateUser(id, email, password, role, maxDownloads, maxScrapes);
+        showToast("Usuário atualizado com sucesso!");
+        const dialog = $("#edit-user-dialog");
+        if (dialog?.close) dialog.close();
+        else dialog.removeAttribute("open");
+        await loadAndRenderAdminUsers();
+      } catch (err) {
+        showToast(err.message, true);
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Salvar Alterações";
+      }
+    });
+
+    $("#btn-close-edit-dialog")?.addEventListener("click", () => {
+      const dialog = $("#edit-user-dialog");
+      if (dialog?.close) dialog.close();
+      else dialog.removeAttribute("open");
+    });
+
+    $("#btn-save-supabase-cfg")?.addEventListener("click", async () => {
+      const url = $("#cfg-supabase-url").value;
+      const key = $("#cfg-supabase-key").value;
+      if (!url || !key) {
+        showToast("Informe a URL e a Anon Key.", true);
+        return;
+      }
+      await globalThis.RobinAuth.setSupabaseConfig(url, key);
+      showToast("Configurações do Supabase salvas!");
+    });
+
+    $("#btn-test-supabase-cfg")?.addEventListener("click", async () => {
+      const testBtn = $("#btn-test-supabase-cfg");
+      testBtn.disabled = true;
+      testBtn.textContent = "Testando...";
+      try {
+        const url = $("#cfg-supabase-url").value || globalThis.RobinAuth.CONFIG.SUPABASE_URL;
+        const key = $("#cfg-supabase-key").value || globalThis.RobinAuth.CONFIG.ANON_KEY;
+        const res = await fetch(`${url}/rest/v1/`, {
+          method: "GET",
+          headers: { "apikey": key, "Authorization": `Bearer ${key}` }
+        });
+        if (res.ok) {
+          showToast("Conexão com Supabase bem-sucedida!");
+        } else {
+          showToast(`Servidor respondeu com código ${res.status}`, true);
+        }
+      } catch (err) {
+        showToast(`Erro ao conectar: ${err.message}`, true);
+      } finally {
+        testBtn.disabled = false;
+        testBtn.textContent = "Testar Conexão";
+      }
+    });
 
     $("#btn-open-tab")?.addEventListener("click", () => {
       chrome.tabs.create({ url: chrome.runtime.getURL("popup.html") });
@@ -898,25 +1085,52 @@
     state.downloaded = stored.downloaded || {};
     state.authSession = stored.authSession || null;
 
-    // Verificação de Licença Zero-Trust no servidor
+    // Carregar e-mail lembrado e credenciais configuradas
     try {
-      const storedTokens = await globalThis.RobinAuth.getStoredTokens();
-      if (storedTokens?.refreshToken || storedTokens?.session) {
-        const verification = await globalThis.RobinAuth.verifyLicenseWithServer();
-        if (verification && verification.authorized) {
-          updateAuthUI({ ...verification, email: storedTokens.user?.email });
-        } else {
-          updateAuthUI(null);
-          if (verification && !verification.authorized && verification.code === "NO_ACTIVE_LICENSE") {
-            showAuthError404();
+      const rem = await chrome.storage.local.get("robin_remember_email");
+      if (rem?.robin_remember_email && $("#auth-email")) {
+        $("#auth-email").value = rem.robin_remember_email;
+      }
+      if ($("#cfg-supabase-url")) $("#cfg-supabase-url").value = globalThis.RobinAuth.CONFIG.SUPABASE_URL;
+      if ($("#cfg-supabase-key")) $("#cfg-supabase-key").value = globalThis.RobinAuth.CONFIG.ANON_KEY;
+    } catch (_) {}
+
+    // 1. Restauração instantânea de sessão salva (PERMANECE LOGADO AO FECHAR EXTENSÃO)
+    try {
+      const storedSession = await globalThis.RobinAuth.getStoredSession();
+      if (storedSession?.user && storedSession?.token) {
+        updateAuthUI({
+          authorized: true,
+          user: storedSession.user,
+          email: storedSession.user.email,
+          role: storedSession.user.role,
+          status: storedSession.user.status,
+          expiresAt: storedSession.user.expires_at,
+          limits: {
+            maxDownloads: storedSession.user.max_downloads_per_day,
+            maxScrapes: storedSession.user.max_scrapes_per_day
           }
-        }
+        });
       } else {
         updateAuthUI(null);
       }
     } catch (_) {
       updateAuthUI(null);
     }
+
+    // 2. Validação transparente em segundo plano com o Supabase
+    try {
+      const storedSession = await globalThis.RobinAuth.getStoredSession();
+      if (storedSession?.token) {
+        const check = await globalThis.RobinAuth.checkSession();
+        if (check && check.authorized) {
+          updateAuthUI(check);
+        } else if (check?.code === "USER_INACTIVE" || check?.code === "USER_EXPIRED") {
+          await handleLogout();
+          showAuthAlert(check.error || "Sua conta foi inativada ou sua assinatura mensal expirou.", "error");
+        }
+      }
+    } catch (_) {}
 
     syncControlsWithState();
     await detectActiveTabContext();
