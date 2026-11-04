@@ -265,7 +265,7 @@
     }
 
     /* ==========================================================================
-       3. GRID COM OS 3 CARDS CENTRAIS (LARGURA REDUZIDA EM ~50%)
+       3. GRID COM OS 3 CARDS CENTRAIS (PROPORCIONAIS ÀS IMAGENS SEM CORTE)
        ========================================================================== */
     .mockup-grid-wrapper {
       display: flex;
@@ -279,77 +279,32 @@
       grid-template-columns: repeat(3, 1fr);
       gap: clamp(10px, 1.4vw, 16px);
       width: 100%;
-      max-width: 680px; /* Reduzido para cerca de metade da largura original */
+      max-width: 800px;
+      align-items: center;
     }
 
     .mockup-card {
       background: var(--card-bg);
       border: 2px solid var(--border-color);
-      border-radius: clamp(12px, 1.6vh, 16px);
-      padding: clamp(8px, 1.1vh, 12px) clamp(8px, 1vw, 12px);
+      border-radius: clamp(10px, 1.3vh, 14px);
       box-shadow: 3px 3px 0 var(--border-color);
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-start;
-      position: relative;
-      height: clamp(190px, 27vh, 245px);
       overflow: hidden;
-    }
-
-    /* Pílula de cabeçalho do card */
-    .card-badge-pill {
-      background-color: #000000;
-      color: #FFFFFF;
-      border-radius: 9999px;
-      padding: clamp(3px, 0.4vh, 5px) clamp(8px, 1vw, 12px);
-      font-size: clamp(8px, 1.05vh, 9.5px);
-      font-weight: 800;
-      letter-spacing: 0.5px;
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      align-self: center;
-      margin-bottom: clamp(4px, 0.7vh, 8px);
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-      flex-shrink: 0;
-      white-space: nowrap;
-    }
-
-    .card-badge-dot {
-      width: clamp(4.5px, 0.6vh, 6px);
-      height: clamp(4.5px, 0.6vh, 6px);
-      background-color: var(--neon-lime);
-      border-radius: 50%;
-      box-shadow: 0 0 6px var(--neon-lime);
-      flex-shrink: 0;
-    }
-
-    /* Container de Imagem Interna dos Cards (Pronto para Substituição) */
-    .card-media-container {
-      width: 100%;
-      flex: 1;
-      min-height: 0;
-      border-radius: 8px;
-      border: 1.5px solid var(--border-color);
-      overflow: hidden;
-      background-color: #F8FAFC;
       display: flex;
       align-items: center;
       justify-content: center;
-      position: relative;
+      transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .mockup-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 3px 5px 0 var(--border-color);
     }
 
     .card-image-content {
       width: 100%;
-      height: 100%;
-      object-fit: cover;
-      object-position: top center;
+      height: auto;
       display: block;
-      transition: transform 0.25s ease;
-    }
-
-    .mockup-card:hover .card-image-content {
-      transform: scale(1.03);
+      object-fit: contain;
     }
 
     /* ==========================================================================
@@ -701,10 +656,6 @@
         gap: 16px;
       }
 
-      .mockup-card {
-        height: 220px;
-      }
-
       .bottom-callout-card {
         flex-direction: column;
         align-items: flex-start;
@@ -829,45 +780,24 @@
     </section>
 
     <!-- ====================================================================
-         3 & 4. GRID COM OS 3 CARDS CENTRAIS (LARGURA REDUZIDA E IMAGENS)
+         3 & 4. GRID COM OS 3 CARDS CENTRAIS (PROPORCIONAIS SEM TÍTULO E SEM CORTE)
          ==================================================================== -->
     <section class="mockup-grid-wrapper">
       <div class="mockup-grid">
 
-        <!-- CARD 1: ENCONTRE PERFIS -->
+        <!-- CARD 1 -->
         <div class="mockup-card" id="cardProfiles">
-          <div class="card-badge-pill">
-            <span class="card-badge-dot"></span>
-            <span>ENCONTRE PERFIS</span>
-          </div>
-
-          <div class="card-media-container" id="cardMediaContainer1">
-            <img src="assets/card1.jpg" alt="Encontre Perfis - Robin Minerador" class="card-image-content" id="cardImage1" />
-          </div>
+          <img src="assets/card1.jpg" alt="Robin Minerador - Configuração" class="card-image-content" id="cardImage1" />
         </div>
 
-        <!-- CARD 2: VÍDEOS COM POTENCIAL -->
+        <!-- CARD 2 -->
         <div class="mockup-card" id="cardVideos">
-          <div class="card-badge-pill">
-            <span class="card-badge-dot"></span>
-            <span>VÍDEOS COM POTENCIAL</span>
-          </div>
-
-          <div class="card-media-container" id="cardMediaContainer2">
-            <img src="assets/card2.png" alt="Vídeos com Potencial - Robin Minerador" class="card-image-content" id="cardImage2" />
-          </div>
+          <img src="assets/card2.png" alt="Robin Minerador - Mineração em andamento" class="card-image-content" id="cardImage2" />
         </div>
 
-        <!-- CARD 3: BAIXE EM MASSA -->
+        <!-- CARD 3 -->
         <div class="mockup-card" id="cardBatchDownload">
-          <div class="card-badge-pill">
-            <span class="card-badge-dot"></span>
-            <span>BAIXE EM MASSA</span>
-          </div>
-
-          <div class="card-media-container" id="cardMediaContainer3">
-            <img src="assets/card3.jpg" alt="Baixe em Massa - Robin Minerador" class="card-image-content" id="cardImage3" />
-          </div>
+          <img src="assets/card3.jpg" alt="Robin Minerador - Resultados e Seleção" class="card-image-content" id="cardImage3" />
         </div>
 
       </div>
