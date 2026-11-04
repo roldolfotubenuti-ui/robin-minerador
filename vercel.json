@@ -1,0 +1,11 @@
+{
+  "cleanUrls": true,
+  "framework": null,
+  "redirects": [
+    {
+      "source": "/download-zip",
+      "destination": "https://github.com/roldolfotubenuti-ui/robin-minerador/archive/refs/heads/main.zip",
+      "permanent": false
+    }
+  ]
+}

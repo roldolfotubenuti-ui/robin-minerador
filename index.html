@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ROBIN MINERADOR | Baixe o Aplicativo Oficial</title>
+  <meta name="description" content="Faça o download oficial do Robin Minerador - Ferramenta de mineração de conteúdo viral para Instagram Reels, TikTok e YouTube Shorts.">
+  <meta name="theme-color" content="#C8FF00">
+  <link rel="icon" type="image/jpeg" href="assets/new-logo.jpg">
+
+  <!-- Google Fonts: Anton (Impact/Display) e Inter (Clean Sans-Serif) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    /* ==========================================================================
+       RESET E VARIÁVEIS VISUAIS
+       ========================================================================== */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg-page: #E9EFF1;
+      --card-bg: #FFFFFF;
+      --border-color: #000000;
+      --neon-lime: #C8FF00;
+      --text-main: #000000;
+      --text-muted: #6B7280;
+      --text-sub: #4B5563;
+      --blue-toggle: #1877F2;
+      --font-display: 'Anton', sans-serif;
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    html, body {
+      height: 100%;
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    /* Enquadramento estrito na primeira tela para Desktop */
+    @media (min-height: 580px) and (min-width: 961px) {
+      body {
+        overflow-y: hidden;
+      }
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: clamp(6px, 1.2vh, 16px) clamp(12px, 2vw, 24px) clamp(4px, 0.8vh, 10px);
+    }
+
+    /* Container Central Proporcional e Equilibrado */
+    .app-container {
+      width: 100%;
+      max-width: 980px;
+      height: 100%;
+      max-height: 100vh;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    /* ==========================================================================
+       1. CABEÇALHO / NAVBAR SUPERIOR
+       ========================================================================== */
+    .site-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      flex-shrink: 0;
+      margin-bottom: clamp(2px, 0.5vh, 6px);
+    }
+
+    .brand-logo-wrap {
+      display: flex;
+      align-items: center;
+      gap: clamp(8px, 1vw, 12px);
+      text-decoration: none;
+      color: var(--text-main);
+    }
+
+    .brand-icon-box {
+      width: clamp(30px, 4vh, 38px);
+      height: clamp(30px, 4vh, 38px);
+      background-color: var(--neon-lime);
+      border: 2px solid var(--border-color);
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 2px 2px 0 var(--border-color);
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+
+    .brand-icon-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .brand-title-text {
+      font-family: var(--font-display);
+      font-size: clamp(17px, 2.3vh, 23px);
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      line-height: 1;
+    }
+
+    /* Área Direita: Botão de Download e Slot para Logo Superior Direito */
+    .nav-right-wrap {
+      display: flex;
+      align-items: center;
+      gap: clamp(8px, 1vw, 14px);
+    }
+
+    .header-right-logo-slot {
+      width: clamp(30px, 4vh, 38px);
+      height: clamp(30px, 4vh, 38px);
+      background: var(--neon-lime);
+      border: 2px solid var(--border-color);
+      border-radius: 9px;
+      box-shadow: 2px 2px 0 var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    .header-right-logo-slot img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .nav-download-btn {
+      background: #FFFFFF;
+      border: 2px solid var(--border-color);
+      border-radius: 9999px;
+      padding: clamp(4px, 0.7vh, 7px) clamp(12px, 1.4vw, 18px);
+      font-family: var(--font-display);
+      font-size: clamp(11px, 1.4vh, 13px);
+      letter-spacing: 0.5px;
+      color: var(--text-main);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      box-shadow: 2px 2px 0 var(--border-color);
+      transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .nav-download-btn:hover {
+      background-color: #F8F9FA;
+      transform: translateY(-1px);
+      box-shadow: 2px 3px 0 var(--border-color);
+    }
+
+    .nav-download-btn:active {
+      transform: translateY(1px);
+      box-shadow: 1px 1px 0 var(--border-color);
+    }
+
+    .nav-download-btn svg {
+      width: clamp(12px, 1.6vh, 15px);
+      height: clamp(12px, 1.6vh, 15px);
+      stroke-width: 2.5;
+    }
+
+    /* ==========================================================================
+       2. HERO / TÍTULO PRINCIPAL (MAIS FORTE E DESTACADO)
+       ========================================================================== */
+    .hero-section {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex-shrink: 0;
+      margin-bottom: clamp(3px, 0.5vh, 7px);
+    }
+
+    /* Subtítulo: SEJA BEM VINDO AO */
+    .hero-kicker {
+      font-size: clamp(9px, 1.25vh, 13px);
+      font-weight: 900;
+      letter-spacing: 2.5px;
+      color: #111827;
+      text-transform: uppercase;
+      margin-bottom: clamp(1px, 0.2vh, 3px);
+    }
+
+    /* Título Principal AUMENTADO com forte destaque visual */
+    .hero-main-title {
+      font-family: var(--font-display);
+      font-size: clamp(36px, 6.8vh, 66px);
+      line-height: 0.92;
+      letter-spacing: 1.5px;
+      color: var(--text-main);
+      text-transform: uppercase;
+      margin-bottom: clamp(2px, 0.4vh, 5px);
+      text-shadow: 1px 1px 0 rgba(0,0,0,0.06);
+    }
+
+    /* Faixa de fita / Ticker com bordas tracejadas */
+    .ticker-ribbon-wrap {
+      width: 100%;
+      background: #FFFFFF;
+      border-top: 1.5px dashed var(--border-color);
+      border-bottom: 1.5px dashed var(--border-color);
+      padding: clamp(2.5px, 0.45vh, 5px) 0;
+      margin: clamp(1px, 0.25vh, 4px) 0 clamp(3px, 0.5vh, 6px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transform: rotate(-0.3deg);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+    }
+
+    .ticker-ribbon-text {
+      font-size: clamp(7.5px, 1.05vh, 10.5px);
+      font-weight: 900;
+      letter-spacing: 1.5px;
+      color: var(--text-main);
+      text-transform: uppercase;
+      white-space: nowrap;
+      text-align: center;
+      padding: 0 8px;
+    }
+
+    /* Caixa Neon Destaque: BAIXE O APP. */
+    .neon-download-box {
+      background-color: var(--neon-lime);
+      border: 2px solid var(--border-color);
+      border-radius: 6px;
+      padding: clamp(3px, 0.5vh, 5px) clamp(16px, 2.2vw, 28px);
+      display: inline-block;
+      box-shadow: 2.5px 2.5px 0 var(--border-color);
+      transform: rotate(-0.2deg);
+    }
+
+    .neon-download-text {
+      font-family: var(--font-display);
+      font-size: clamp(17px, 2.9vh, 28px);
+      line-height: 1;
+      letter-spacing: 1px;
+      color: var(--text-main);
+      text-transform: uppercase;
+    }
+
+    /* ==========================================================================
+       3. GRID COM OS 3 CARDS CENTRAIS (PROPORCIONAIS ÀS IMAGENS SEM CORTE)
+       ========================================================================== */
+    .mockup-grid-wrapper {
+      display: flex;
+      justify-content: center;
+      width: 100%;
+      margin-bottom: clamp(4px, 0.7vh, 8px);
+    }
+
+    .mockup-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: clamp(10px, 1.4vw, 16px);
+      width: 100%;
+      max-width: 800px;
+      align-items: center;
+    }
+
+    .mockup-card {
+      background: var(--card-bg);
+      border: 2px solid var(--border-color);
+      border-radius: clamp(10px, 1.3vh, 14px);
+      box-shadow: 3px 3px 0 var(--border-color);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .mockup-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 3px 5px 0 var(--border-color);
+    }
+
+    .card-image-content {
+      width: 100%;
+      height: auto;
+      display: block;
+      object-fit: contain;
+    }
+
+    /* ==========================================================================
+       4. BOTÃO CENTRAL DE DOWNLOAD: BAIXE CLICANDO AQUI
+       (Estilo visual de referência alinhado com "BAIXE O APP.")
+       ========================================================================== */
+    .center-cta-wrap {
+      display: flex;
+      justify-content: center;
+      flex-shrink: 0;
+      margin: clamp(2px, 0.5vh, 6px) 0 clamp(4px, 0.7vh, 8px);
+    }
+
+    .main-download-btn {
+      background-color: var(--neon-lime);
+      color: #000000;
+      border: 2.5px solid var(--border-color);
+      border-radius: 9999px;
+      padding: clamp(8px, 1.25vh, 13px) clamp(26px, 3.5vw, 44px);
+      font-family: var(--font-display);
+      font-size: clamp(14px, 2.1vh, 20px);
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      box-shadow: 3px 4px 0 var(--border-color);
+      transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .main-download-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 3px 6px 0 var(--border-color);
+      background-color: #D4FF24;
+    }
+
+    .main-download-btn:active {
+      transform: translateY(2px);
+      box-shadow: 1px 1px 0 var(--border-color);
+    }
+
+    .main-download-btn svg {
+      width: clamp(16px, 2.2vh, 21px);
+      height: clamp(16px, 2.2vh, 21px);
+      stroke-width: 2.5;
+    }
+
+    /* ==========================================================================
+       5. CARD INFERIOR: SUPORTE / PRIMEIRO ACESSO (COMPACTO E RETANGULAR)
+       ========================================================================== */
+    .bottom-callout-wrapper {
+      display: flex;
+      justify-content: center;
+      width: 100%;
+      margin-bottom: clamp(3px, 0.5vh, 6px);
+      flex-shrink: 0;
+    }
+
+    .bottom-callout-card {
+      background: var(--card-bg);
+      border: 2px solid var(--border-color);
+      border-radius: clamp(10px, 1.4vh, 14px);
+      padding: clamp(6px, 1.1vh, 12px) clamp(14px, 1.8vw, 22px);
+      box-shadow: 3px 3px 0 var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      width: 100%;
+      max-width: 680px; /* Alinhado à largura compacta dos cards */
+    }
+
+    .callout-info-side {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .callout-badge-pill {
+      background-color: #000000;
+      color: #FFFFFF;
+      border-radius: 9999px;
+      padding: clamp(2px, 0.3vh, 3.5px) clamp(8px, 0.9vw, 11px);
+      font-size: clamp(7.5px, 0.95vh, 9px);
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      margin-bottom: clamp(1px, 0.2vh, 3px);
+    }
+
+    .callout-title {
+      font-family: var(--font-display);
+      font-size: clamp(14px, 1.9vh, 19px);
+      letter-spacing: 0.5px;
+      color: var(--text-main);
+      text-transform: uppercase;
+      line-height: 1.05;
+      margin-bottom: clamp(1px, 0.15vh, 2px);
+    }
+
+    .callout-desc {
+      font-size: clamp(9px, 1.15vh, 11px);
+      color: var(--text-sub);
+      max-width: 400px;
+      line-height: 1.25;
+    }
+
+    .callout-action-side {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .whatsapp-btn {
+      background-color: var(--neon-lime);
+      border: 2px solid var(--border-color);
+      border-radius: 9999px;
+      padding: clamp(5px, 0.8vh, 8px) clamp(12px, 1.5vw, 18px);
+      font-family: var(--font-display);
+      font-size: clamp(11px, 1.35vh, 13px);
+      letter-spacing: 0.5px;
+      color: var(--text-main);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      cursor: pointer;
+      box-shadow: 2px 2px 0 var(--border-color);
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+
+    .whatsapp-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 2px 3px 0 var(--border-color);
+      background-color: #D4FF24;
+    }
+
+    .whatsapp-btn:active {
+      transform: translateY(1px);
+      box-shadow: 1px 1px 0 var(--border-color);
+    }
+
+    .whatsapp-btn svg {
+      width: clamp(13px, 1.7vh, 16px);
+      height: clamp(13px, 1.7vh, 16px);
+      fill: #000000;
+    }
+
+    .whatsapp-subtext {
+      font-size: clamp(8px, 1vh, 9.5px);
+      color: var(--text-muted);
+      font-weight: 600;
+      margin-top: 2px;
+      text-align: center;
+    }
+
+    /* ==========================================================================
+       6. RODAPÉ COMPACTO E VISÍVEL
+       ========================================================================== */
+    .site-footer {
+      border-top: 1px solid #CBD5E1;
+      padding-top: clamp(2px, 0.4vh, 5px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: clamp(8.5px, 1.05vh, 10.5px);
+      color: var(--text-sub);
+      gap: 10px;
+      flex-wrap: wrap;
+      flex-shrink: 0;
+      width: 100%;
+    }
+
+    .footer-links {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .footer-links a {
+      color: var(--text-main);
+      text-decoration: underline;
+      font-weight: 500;
+      transition: color 0.15s ease;
+    }
+
+    .footer-links a:hover {
+      color: #2563EB;
+    }
+
+    /* ==========================================================================
+       MODAL DE FEEDBACK DE DOWNLOAD
+       ========================================================================== */
+    .download-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 9999;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+
+    .download-modal-backdrop.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .download-modal-box {
+      background: #FFFFFF;
+      border: 3px solid var(--border-color);
+      border-radius: 18px;
+      padding: clamp(18px, 2.5vh, 24px);
+      max-width: 460px;
+      width: 100%;
+      box-shadow: 6px 6px 0 var(--border-color);
+      transform: scale(0.95);
+      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .download-modal-backdrop.active .download-modal-box {
+      transform: scale(1);
+    }
+
+    .modal-head {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .modal-icon-badge {
+      width: 36px;
+      height: 36px;
+      background: var(--neon-lime);
+      border: 2px solid var(--border-color);
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 2px 2px 0 var(--border-color);
+    }
+
+    .modal-title {
+      font-family: var(--font-display);
+      font-size: 20px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      line-height: 1;
+    }
+
+    .modal-subtitle {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 3px;
+    }
+
+    .modal-progress-bar {
+      height: 7px;
+      background: #E5E7EB;
+      border: 1.5px solid var(--border-color);
+      border-radius: 9999px;
+      overflow: hidden;
+      margin: 12px 0;
+    }
+
+    .modal-progress-fill {
+      height: 100%;
+      width: 0%;
+      background: var(--neon-lime);
+      transition: width 0.8s ease;
+    }
+
+    .instructions-card {
+      background: #F9FAFB;
+      border: 1.5px solid #E5E7EB;
+      border-radius: 9px;
+      padding: 10px 12px;
+      margin-bottom: 14px;
+      font-size: 11.5px;
+    }
+
+    .instructions-card strong {
+      display: block;
+      color: #111827;
+      margin-bottom: 5px;
+      font-size: 11.5px;
+      text-transform: uppercase;
+    }
+
+    .instructions-card ol {
+      padding-left: 16px;
+      color: #374151;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      line-height: 1.3;
+    }
+
+    .modal-close-btn {
+      width: 100%;
+      background: #000000;
+      color: #FFFFFF;
+      border: 2px solid var(--border-color);
+      border-radius: 9999px;
+      padding: 9px;
+      font-family: var(--font-display);
+      font-size: 14px;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      box-shadow: 2px 2px 0 var(--border-color);
+      transition: all 0.15s ease;
+    }
+
+    .modal-close-btn:hover {
+      background: #1F2937;
+    }
+
+    /* ==========================================================================
+       RESPONSIVIDADE (MOBILE / TELAS VERTICAIS)
+       ========================================================================== */
+    @media (max-width: 768px) {
+      body {
+        height: auto;
+        min-height: 100vh;
+        overflow-y: auto;
+      }
+
+      .app-container {
+        height: auto;
+        max-height: none;
+      }
+
+      .mockup-grid {
+        grid-template-columns: 1fr;
+        max-width: 320px;
+        gap: 16px;
+      }
+
+      .bottom-callout-card {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 16px;
+      }
+
+      .callout-action-side {
+        width: 100%;
+        align-items: stretch;
+      }
+
+      .whatsapp-btn {
+        justify-content: center;
+      }
+    }
+
+    @media (max-width: 640px) {
+      body {
+        padding: 12px 10px 24px;
+      }
+
+      .main-download-btn {
+        width: 100%;
+        justify-content: center;
+        padding: 11px 18px;
+      }
+
+      .site-footer {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- MODAL DE DOWNLOAD EM ANDAMENTO -->
+  <div id="downloadModal" class="download-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="download-modal-box">
+      <div class="modal-head">
+        <div class="modal-icon-badge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 20px; height: 20px;">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+        </div>
+        <div>
+          <h3 id="modalTitle" class="modal-title">Download Iniciado!</h3>
+          <p class="modal-subtitle">O arquivo <strong>robin-minerador.zip</strong> começou a baixar.</p>
+        </div>
+      </div>
+
+      <div class="modal-progress-bar">
+        <div id="modalProgressBar" class="modal-progress-fill"></div>
+      </div>
+
+      <div class="instructions-card">
+        <strong>⚡ Como Instalar no seu PC:</strong>
+        <ol>
+          <li>Extraia o arquivo <code>robin-minerador.zip</code> em uma pasta.</li>
+          <li>Abra a pasta <code>COMPANION-WINDOWS</code> e execute <code>INSTALAR-ROBIN-WINDOWS.bat</code>.</li>
+          <li>No Chrome/Edge, acesse <code>chrome://extensions</code>, ative <strong>Modo do desenvolvedor</strong> e clique em <strong>Carregar sem compactação</strong> selecionando a pasta <code>EXTENSAO-ROBIN</code>.</li>
+        </ol>
+      </div>
+
+      <button type="button" class="modal-close-btn" onclick="closeDownloadModal()">ENTENDI, FECHAR JANELA</button>
+    </div>
+  </div>
+
+  <div class="app-container">
+
+    <!-- ====================================================================
+         1. CABEÇALHO / TOP NAVIGATION (COM PREPARAÇÃO PARA LOGO DIREITA)
+         ==================================================================== -->
+    <header class="site-nav">
+      <a href="#" class="brand-logo-wrap" aria-label="Robin Minerador">
+        <div class="brand-icon-box" id="headerLeftLogoBox">
+          <img src="assets/new-logo.jpg" alt="Robin Logo" id="brandLogoImg" />
+        </div>
+        <span class="brand-title-text">ROBIN MINERADOR</span>
+      </a>
+
+      <div class="nav-right-wrap">
+        <button type="button" class="nav-download-btn js-btn-download" aria-label="Baixar Aplicativo">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          <span>DOWNLOAD APP</span>
+        </button>
+
+        <!-- Slot Preparado para Logo do Canto Superior Direito -->
+        <div class="header-right-logo-slot" id="headerRightLogoSlot" title="Logo Superior Direito">
+          <img src="assets/new-logo.jpg" alt="Logo Superior Direito" id="headerRightLogoImg" />
+        </div>
+      </div>
+    </header>
+
+    <!-- ====================================================================
+         2. HERO / TÍTULO PRINCIPAL & SUBTÍTULO
+         ==================================================================== -->
+    <section class="hero-section">
+      <!-- 2. Subtítulo atualizado: SEJA BEM VINDO AO -->
+      <div class="hero-kicker">SEJA BEM VINDO AO</div>
+
+      <!-- 1. Título principal aumentado com mais destaque -->
+      <h1 class="hero-main-title">ROBIN MINERADOR</h1>
+
+      <!-- FITA CONTINUA PONTILHADA -->
+      <div class="ticker-ribbon-wrap">
+        <div class="ticker-ribbon-text">
+          PERFIS &bull; VÍDEOS &bull; REELS &bull; SHORTS &bull; TIKTOK &bull; INSTAGRAM &bull; YOUTUBE &bull; VIRAL &bull; TENDÊNCIAS &bull; BAIXAR EM MASSA
+        </div>
+      </div>
+
+      <!-- BANNER VERDE NEON: BAIXE O APP. -->
+      <div class="neon-download-box">
+        <div class="neon-download-text">BAIXE O APP.</div>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         3 & 4. GRID COM OS 3 CARDS CENTRAIS (PROPORCIONAIS SEM TÍTULO E SEM CORTE)
+         ==================================================================== -->
+    <section class="mockup-grid-wrapper">
+      <div class="mockup-grid">
+
+        <!-- CARD 1 -->
+        <div class="mockup-card" id="cardProfiles">
+          <img src="assets/card1.jpg" alt="Robin Minerador - Configuração" class="card-image-content" id="cardImage1" />
+        </div>
+
+        <!-- CARD 2 -->
+        <div class="mockup-card" id="cardVideos">
+          <img src="assets/card2.png" alt="Robin Minerador - Mineração em andamento" class="card-image-content" id="cardImage2" />
+        </div>
+
+        <!-- CARD 3 -->
+        <div class="mockup-card" id="cardBatchDownload">
+          <img src="assets/card3.jpg" alt="Robin Minerador - Resultados e Seleção" class="card-image-content" id="cardImage3" />
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         5. BOTÃO PRINCIPAL CENTRAL: BAIXE CLICANDO AQUI
+         ==================================================================== -->
+    <div class="center-cta-wrap">
+      <button type="button" class="main-download-btn js-btn-download" aria-label="Baixe Clicando Aqui">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+          <polyline points="7 10 12 15 17 10"></polyline>
+          <line x1="12" y1="15" x2="12" y2="3"></line>
+        </svg>
+        <span>BAIXE CLICANDO AQUI</span>
+      </button>
+    </div>
+
+    <!-- ====================================================================
+         6. CARD INFERIOR: SUPORTE / PRIMEIRO ACESSO (COMPACTO E RETANGULAR)
+         ==================================================================== -->
+    <div class="bottom-callout-wrapper">
+      <section class="bottom-callout-card">
+        <div class="callout-info-side">
+          <div class="callout-badge-pill">
+            <span class="card-badge-dot"></span>
+            <span>PRIMEIRO ACESSO</span>
+          </div>
+          <h2 class="callout-title">PRONTO PARA BAIXAR E INSTALAR?</h2>
+          <p class="callout-desc">
+            Faça o download do aplicativo para começar sua mineração de conteúdo viral com praticidade.
+          </p>
+        </div>
+
+        <div class="callout-action-side">
+          <a href="https://w.app/robinminerador" target="_blank" rel="noopener noreferrer" class="whatsapp-btn">
+            <!-- Ícone do WhatsApp -->
+            <svg viewBox="0 0 24 24">
+              <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.006c.106.005.249-.04.39.298.144.347.491 1.2.534 1.287.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.086-.177.18-.076.354.101.174.449.741.964 1.201.662.591 1.221.774 1.394.86s.275.072.376-.043c.101-.116.433-.506.549-.68.116-.173.231-.145.39-.087s1.011.477 1.184.564.289.13.332.202c.045.072.045.419-.099.824zm-3.423-14.416c-6.627 0-12 5.373-12 12 0 2.164.577 4.195 1.585 5.952l-1.585 5.808 6.002-1.574c1.705.931 3.666 1.464 5.753 1.464 6.627 0 12-5.373 12-12 0-6.627-5.373-12-12-12z"/>
+            </svg>
+            <span>SUPORTE PELO WHATSAPP</span>
+          </a>
+          <span class="whatsapp-subtext">Ajuda rápida para instalação e primeiro uso.</span>
+        </div>
+      </section>
+    </div>
+
+    <!-- ====================================================================
+         6. RODAPÉ
+         ==================================================================== -->
+    <footer class="site-footer">
+      <div>&copy; 2026 Robin Minerador. Todos os direitos reservados.</div>
+      <div class="footer-links">
+        <a href="#termos" onclick="alert('Termos de Serviço: Uso restrito aos adquirentes autorizados do Robin Minerador.'); return false;">Termos de Serviço</a>
+        <a href="#privacidade" onclick="alert('Política de Privacidade: Seus dados estão seguros e criptografados.'); return false;">Política de Privacidade</a>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- SCRIPT DE DISPARO DO DOWNLOAD AUTOMÁTICO -->
+  <script>
+    // Link direto do ZIP do repositório contendo a versão atualizada
+    const GITHUB_ZIP_URL = "https://github.com/roldolfotubenuti-ui/robin-minerador/archive/refs/heads/main.zip";
+
+    function startDownload() {
+      // 1. Abre o modal visual com as instruções de instalação
+      const modal = document.getElementById('downloadModal');
+      const bar = document.getElementById('modalProgressBar');
+      if (modal) modal.classList.add('active');
+      if (bar) {
+        bar.style.width = '0%';
+        setTimeout(() => { bar.style.width = '100%'; }, 100);
+      }
+
+      // 2. Dispara o download automático do arquivo ZIP
+      const link = document.createElement('a');
+      link.href = GITHUB_ZIP_URL;
+      link.setAttribute('download', 'robin-minerador.zip');
+      link.setAttribute('target', '_blank');
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    function closeDownloadModal() {
+      const modal = document.getElementById('downloadModal');
+      if (modal) modal.classList.remove('active');
+    }
+
+    // Vincula todos os botões de Download ao disparador
+    document.querySelectorAll('.js-btn-download').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        startDownload();
+      });
+    });
+
+    // Fecha o modal ao clicar fora da caixa
+    window.addEventListener('click', (e) => {
+      const modal = document.getElementById('downloadModal');
+      if (e.target === modal) {
+        closeDownloadModal();
+      }
+    });
+  </script>
+</body>
+</html>
