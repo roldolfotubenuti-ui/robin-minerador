@@ -6,7 +6,7 @@
   <title>ROBIN MINERADOR | Baixe o Aplicativo Oficial</title>
   <meta name="description" content="Faça o download oficial do Robin Minerador - Ferramenta de mineração de conteúdo viral para Instagram Reels, TikTok e YouTube Shorts.">
   <meta name="theme-color" content="#C8FF00">
-  <link rel="icon" type="image/png" href="assets/robin-icon.png">
+  <link rel="icon" type="image/jpeg" href="assets/new-logo.jpg">
 
   <!-- Google Fonts: Anton (Impact/Display) e Inter (Clean Sans-Serif) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -60,10 +60,10 @@
       padding: clamp(6px, 1.2vh, 16px) clamp(12px, 2vw, 24px) clamp(4px, 0.8vh, 10px);
     }
 
-    /* Container Central Proporcional ao Mockup Original */
+    /* Container Central Proporcional e Equilibrado */
     .app-container {
       width: 100%;
-      max-width: 1060px;
+      max-width: 980px;
       height: 100%;
       max-height: 100vh;
       margin: 0 auto;
@@ -81,51 +81,81 @@
       justify-content: space-between;
       width: 100%;
       flex-shrink: 0;
-      margin-bottom: clamp(3px, 0.6vh, 8px);
+      margin-bottom: clamp(2px, 0.5vh, 6px);
     }
 
     .brand-logo-wrap {
       display: flex;
       align-items: center;
-      gap: clamp(6px, 0.8vw, 10px);
+      gap: clamp(8px, 1vw, 12px);
       text-decoration: none;
       color: var(--text-main);
     }
 
     .brand-icon-box {
-      width: clamp(28px, 3.8vh, 36px);
-      height: clamp(28px, 3.8vh, 36px);
+      width: clamp(30px, 4vh, 38px);
+      height: clamp(30px, 4vh, 38px);
       background-color: var(--neon-lime);
       border: 2px solid var(--border-color);
-      border-radius: 8px;
+      border-radius: 9px;
       display: flex;
       align-items: center;
       justify-content: center;
       box-shadow: 2px 2px 0 var(--border-color);
       flex-shrink: 0;
+      overflow: hidden;
     }
 
-    .brand-icon-box svg {
-      width: clamp(16px, 2.2vh, 22px);
-      height: clamp(16px, 2.2vh, 22px);
-      fill: #000000;
+    .brand-icon-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
     }
 
     .brand-title-text {
       font-family: var(--font-display);
-      font-size: clamp(16px, 2.2vh, 22px);
+      font-size: clamp(17px, 2.3vh, 23px);
       letter-spacing: 0.5px;
       text-transform: uppercase;
       line-height: 1;
+    }
+
+    /* Área Direita: Botão de Download e Slot para Logo Superior Direito */
+    .nav-right-wrap {
+      display: flex;
+      align-items: center;
+      gap: clamp(8px, 1vw, 14px);
+    }
+
+    .header-right-logo-slot {
+      width: clamp(30px, 4vh, 38px);
+      height: clamp(30px, 4vh, 38px);
+      background: var(--neon-lime);
+      border: 2px solid var(--border-color);
+      border-radius: 9px;
+      box-shadow: 2px 2px 0 var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    .header-right-logo-slot img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
     }
 
     .nav-download-btn {
       background: #FFFFFF;
       border: 2px solid var(--border-color);
       border-radius: 9999px;
-      padding: clamp(4px, 0.7vh, 7px) clamp(12px, 1.4vw, 20px);
+      padding: clamp(4px, 0.7vh, 7px) clamp(12px, 1.4vw, 18px);
       font-family: var(--font-display);
-      font-size: clamp(11px, 1.4vh, 13.5px);
+      font-size: clamp(11px, 1.4vh, 13px);
       letter-spacing: 0.5px;
       color: var(--text-main);
       text-decoration: none;
@@ -155,7 +185,7 @@
     }
 
     /* ==========================================================================
-       2. HERO / TÍTULO PRINCIPAL & BANNER
+       2. HERO / TÍTULO PRINCIPAL (MAIS FORTE E DESTACADO)
        ========================================================================== */
     .hero-section {
       text-align: center;
@@ -163,26 +193,29 @@
       flex-direction: column;
       align-items: center;
       flex-shrink: 0;
-      margin-bottom: clamp(4px, 0.7vh, 8px);
+      margin-bottom: clamp(3px, 0.5vh, 7px);
     }
 
+    /* Subtítulo: SEJA BEM VINDO AO */
     .hero-kicker {
-      font-size: clamp(8px, 1.1vh, 11px);
-      font-weight: 800;
-      letter-spacing: 1.8px;
-      color: #1F2937;
+      font-size: clamp(9px, 1.25vh, 13px);
+      font-weight: 900;
+      letter-spacing: 2.5px;
+      color: #111827;
       text-transform: uppercase;
       margin-bottom: clamp(1px, 0.2vh, 3px);
     }
 
+    /* Título Principal AUMENTADO com forte destaque visual */
     .hero-main-title {
       font-family: var(--font-display);
-      font-size: clamp(26px, 5vh, 48px);
-      line-height: 0.95;
-      letter-spacing: 1.2px;
+      font-size: clamp(36px, 6.8vh, 66px);
+      line-height: 0.92;
+      letter-spacing: 1.5px;
       color: var(--text-main);
       text-transform: uppercase;
       margin-bottom: clamp(2px, 0.4vh, 5px);
+      text-shadow: 1px 1px 0 rgba(0,0,0,0.06);
     }
 
     /* Faixa de fita / Ticker com bordas tracejadas */
@@ -191,8 +224,8 @@
       background: #FFFFFF;
       border-top: 1.5px dashed var(--border-color);
       border-bottom: 1.5px dashed var(--border-color);
-      padding: clamp(3px, 0.5vh, 5px) 0;
-      margin: clamp(2px, 0.3vh, 4px) 0 clamp(4px, 0.6vh, 7px);
+      padding: clamp(2.5px, 0.45vh, 5px) 0;
+      margin: clamp(1px, 0.25vh, 4px) 0 clamp(3px, 0.5vh, 6px);
       display: flex;
       justify-content: center;
       align-items: center;
@@ -201,9 +234,9 @@
     }
 
     .ticker-ribbon-text {
-      font-size: clamp(8px, 1.1vh, 11px);
+      font-size: clamp(7.5px, 1.05vh, 10.5px);
       font-weight: 900;
-      letter-spacing: 1.4px;
+      letter-spacing: 1.5px;
       color: var(--text-main);
       text-transform: uppercase;
       white-space: nowrap;
@@ -216,15 +249,15 @@
       background-color: var(--neon-lime);
       border: 2px solid var(--border-color);
       border-radius: 6px;
-      padding: clamp(3px, 0.55vh, 6px) clamp(18px, 2.4vw, 32px);
+      padding: clamp(3px, 0.5vh, 5px) clamp(16px, 2.2vw, 28px);
       display: inline-block;
-      box-shadow: 3px 3px 0 var(--border-color);
+      box-shadow: 2.5px 2.5px 0 var(--border-color);
       transform: rotate(-0.2deg);
     }
 
     .neon-download-text {
       font-family: var(--font-display);
-      font-size: clamp(18px, 3.2vh, 32px);
+      font-size: clamp(17px, 2.9vh, 28px);
       line-height: 1;
       letter-spacing: 1px;
       color: var(--text-main);
@@ -232,27 +265,34 @@
     }
 
     /* ==========================================================================
-       3. GRID COM OS 3 CARDS DO MOCKUP (COMPACTOS E ALINHADOS)
+       3. GRID COM OS 3 CARDS CENTRAIS (LARGURA REDUZIDA EM ~50%)
        ========================================================================== */
+    .mockup-grid-wrapper {
+      display: flex;
+      justify-content: center;
+      width: 100%;
+      margin-bottom: clamp(4px, 0.7vh, 8px);
+    }
+
     .mockup-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: clamp(8px, 1.2vw, 16px);
-      flex: 0 1 auto;
-      margin-bottom: clamp(4px, 0.8vh, 10px);
+      gap: clamp(10px, 1.4vw, 16px);
+      width: 100%;
+      max-width: 680px; /* Reduzido para cerca de metade da largura original */
     }
 
     .mockup-card {
       background: var(--card-bg);
       border: 2px solid var(--border-color);
       border-radius: clamp(12px, 1.6vh, 16px);
-      padding: clamp(8px, 1.2vh, 12px) clamp(10px, 1.2vw, 14px);
+      padding: clamp(8px, 1.1vh, 12px) clamp(8px, 1vw, 12px);
       box-shadow: 3px 3px 0 var(--border-color);
       display: flex;
       flex-direction: column;
       justify-content: flex-start;
       position: relative;
-      height: clamp(210px, 29vh, 275px);
+      height: clamp(190px, 27vh, 245px);
       overflow: hidden;
     }
 
@@ -261,391 +301,127 @@
       background-color: #000000;
       color: #FFFFFF;
       border-radius: 9999px;
-      padding: clamp(3px, 0.4vh, 5px) clamp(10px, 1.2vw, 14px);
-      font-size: clamp(8.5px, 1.1vh, 10px);
+      padding: clamp(3px, 0.4vh, 5px) clamp(8px, 1vw, 12px);
+      font-size: clamp(8px, 1.05vh, 9.5px);
       font-weight: 800;
       letter-spacing: 0.5px;
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
       align-self: center;
-      margin-bottom: clamp(5px, 0.7vh, 8px);
+      margin-bottom: clamp(4px, 0.7vh, 8px);
       box-shadow: 0 1px 3px rgba(0,0,0,0.1);
       flex-shrink: 0;
+      white-space: nowrap;
     }
 
     .card-badge-dot {
-      width: clamp(5px, 0.65vh, 6.5px);
-      height: clamp(5px, 0.65vh, 6.5px);
+      width: clamp(4.5px, 0.6vh, 6px);
+      height: clamp(4.5px, 0.6vh, 6px);
       background-color: var(--neon-lime);
       border-radius: 50%;
       box-shadow: 0 0 6px var(--neon-lime);
       flex-shrink: 0;
     }
 
-    /* CARD 1: ENCONTRE PERFIS */
-    .search-mock-bar {
-      background: #FFFFFF;
-      border: 1.5px solid var(--border-color);
-      border-radius: 9999px;
-      padding: clamp(3px, 0.45vh, 5px) clamp(8px, 1vw, 12px);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: clamp(4px, 0.6vh, 8px);
-      box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
-      flex-shrink: 0;
-    }
-
-    .search-mock-bar svg {
-      width: clamp(11px, 1.4vh, 13px);
-      height: clamp(11px, 1.4vh, 13px);
-      color: #111827;
-      flex-shrink: 0;
-    }
-
-    .search-mock-input {
-      border: none;
-      background: transparent;
-      outline: none;
-      font-size: clamp(9px, 1.15vh, 10.5px);
-      color: var(--text-main);
+    /* Container de Imagem Interna dos Cards (Pronto para Substituição) */
+    .card-media-container {
       width: 100%;
-      font-family: var(--font-sans);
-    }
-
-    .search-mock-input::placeholder {
-      color: #9CA3AF;
-    }
-
-    .profile-list-mock {
-      display: flex;
-      flex-direction: column;
-      justify-content: space-around;
       flex: 1;
       min-height: 0;
-      gap: 2px;
-    }
-
-    .profile-row-mock {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: clamp(1px, 0.25vh, 3px) 0;
-      border-bottom: 1px solid #F3F4F6;
-    }
-
-    .profile-row-mock:last-child {
-      border-bottom: none;
-    }
-
-    .profile-avatar-and-info {
-      display: flex;
-      align-items: center;
-      gap: clamp(6px, 0.8vw, 10px);
-    }
-
-    .profile-avatar {
-      width: clamp(24px, 3.2vh, 30px);
-      height: clamp(24px, 3.2vh, 30px);
-      border-radius: 50%;
-      object-fit: cover;
-      border: 1.5px solid var(--border-color);
-      flex-shrink: 0;
-    }
-
-    .profile-skeleton-bars {
-      display: flex;
-      flex-direction: column;
-      gap: clamp(2px, 0.3vh, 4px);
-    }
-
-    .skeleton-bar-top {
-      height: clamp(5px, 0.7vh, 7px);
-      background-color: #D1D5DB;
-      border-radius: 3px;
-    }
-
-    .skeleton-bar-bottom {
-      height: clamp(4px, 0.5vh, 5px);
-      background-color: #E5E7EB;
-      border-radius: 3px;
-    }
-
-    .profile-action-btn {
-      width: clamp(20px, 2.6vh, 24px);
-      height: clamp(20px, 2.6vh, 24px);
-      border-radius: 6px;
-      border: 1.5px solid var(--border-color);
-      background: #FFFFFF;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      color: #111827;
-      box-shadow: 1px 1px 0 var(--border-color);
-      flex-shrink: 0;
-    }
-
-    .profile-action-btn svg {
-      width: clamp(9px, 1.3vh, 11px);
-      height: clamp(9px, 1.3vh, 11px);
-    }
-
-    /* CARD 2: VÍDEOS COM POTENCIAL */
-    .video-grid-mock {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      grid-template-rows: 1fr 1fr;
-      gap: clamp(4px, 0.6vh, 8px);
-      flex: 1;
-      min-height: 0;
-    }
-
-    .video-item-mock {
-      position: relative;
-      width: 100%;
-      height: 100%;
-      min-height: 0;
-      border-radius: 7px;
-      overflow: hidden;
-      border: 1.5px solid var(--border-color);
-      background-color: #111827;
-    }
-
-    .video-thumb-img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-      transition: transform 0.3s ease;
-    }
-
-    .video-item-mock:hover .video-thumb-img {
-      transform: scale(1.05);
-    }
-
-    .video-play-center {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: clamp(16px, 2.4vh, 22px);
-      height: clamp(16px, 2.4vh, 22px);
-      background: rgba(0, 0, 0, 0.65);
-      backdrop-filter: blur(4px);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #FFFFFF;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.3);
-    }
-
-    .video-play-center svg {
-      width: clamp(8px, 1.1vh, 10px);
-      height: clamp(8px, 1.1vh, 10px);
-      fill: #FFFFFF;
-      margin-left: 1px;
-    }
-
-    .video-views-badge {
-      position: absolute;
-      bottom: 3px;
-      left: 3px;
-      background: rgba(0, 0, 0, 0.75);
-      backdrop-filter: blur(4px);
-      color: #FFFFFF;
-      font-size: clamp(7px, 0.95vh, 8.5px);
-      font-weight: 800;
-      padding: 1.5px 4px;
-      border-radius: 3px;
-      display: inline-flex;
-      align-items: center;
-      gap: 2px;
-      line-height: 1;
-    }
-
-    .video-views-badge svg {
-      width: clamp(6px, 0.9vh, 8px);
-      height: clamp(6px, 0.9vh, 8px);
-      stroke-width: 2.5;
-    }
-
-    /* CARD 3: BAIXE EM MASSA */
-    .toggles-list-mock {
-      display: flex;
-      flex-direction: column;
-      justify-content: space-around;
-      flex: 1;
-      min-height: 0;
-      gap: clamp(3px, 0.5vh, 6px);
-    }
-
-    .toggle-row-mock {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: clamp(3px, 0.5vh, 6px) clamp(8px, 1vw, 12px);
-      background: #FFFFFF;
-      border: 1.5px solid var(--border-color);
       border-radius: 8px;
-      box-shadow: 1px 1px 0 rgba(0,0,0,0.05);
-    }
-
-    .toggle-network-info {
-      display: flex;
-      align-items: center;
-      gap: clamp(6px, 0.8vw, 10px);
-    }
-
-    .network-icon-box {
-      width: clamp(22px, 3vh, 26px);
-      height: clamp(22px, 3vh, 26px);
-      border-radius: 6px;
+      border: 1.5px solid var(--border-color);
+      overflow: hidden;
+      background-color: #F8FAFC;
       display: flex;
       align-items: center;
       justify-content: center;
-      flex-shrink: 0;
-    }
-
-    .network-icon-instagram {
-      background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%);
-      color: #FFFFFF;
-    }
-
-    .network-icon-tiktok {
-      background-color: #000000;
-      color: #FFFFFF;
-    }
-
-    .network-icon-youtube {
-      background-color: #FF0000;
-      color: #FFFFFF;
-    }
-
-    .network-icon-box svg {
-      width: clamp(11px, 1.5vh, 14px);
-      height: clamp(11px, 1.5vh, 14px);
-      fill: currentColor;
-    }
-
-    .network-name-label {
-      font-size: clamp(10.5px, 1.3vh, 13px);
-      font-weight: 700;
-      color: var(--text-main);
-    }
-
-    /* Switch iOS / Moderno */
-    .switch-wrapper {
       position: relative;
-      width: clamp(32px, 4.2vh, 38px);
-      height: clamp(17px, 2.2vh, 20px);
-      cursor: pointer;
-      flex-shrink: 0;
     }
 
-    .switch-wrapper input {
-      opacity: 0;
-      width: 0;
-      height: 0;
+    .card-image-content {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: top center;
+      display: block;
+      transition: transform 0.25s ease;
     }
 
-    .switch-slider {
-      position: absolute;
-      cursor: pointer;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-color: #D1D5DB;
-      transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      border-radius: 9999px;
-      border: 1.5px solid var(--border-color);
-    }
-
-    .switch-slider::before {
-      position: absolute;
-      content: "";
-      height: clamp(11px, 1.5vh, 14px);
-      width: clamp(11px, 1.5vh, 14px);
-      left: 2px;
-      bottom: 1.5px;
-      background-color: #FFFFFF;
-      transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      border-radius: 50%;
-      border: 1px solid rgba(0,0,0,0.2);
-    }
-
-    .switch-wrapper input:checked + .switch-slider {
-      background-color: var(--blue-toggle);
-    }
-
-    .switch-wrapper input:checked + .switch-slider::before {
-      transform: translateX(clamp(13px, 1.7vh, 16px));
+    .mockup-card:hover .card-image-content {
+      transform: scale(1.03);
     }
 
     /* ==========================================================================
-       4. BOTÃO CENTRAL DE DOWNLOAD GIGANTE
+       4. BOTÃO CENTRAL DE DOWNLOAD: BAIXE CLICANDO AQUI
+       (Estilo visual de referência alinhado com "BAIXE O APP.")
        ========================================================================== */
     .center-cta-wrap {
       display: flex;
       justify-content: center;
       flex-shrink: 0;
-      margin: clamp(3px, 0.6vh, 7px) 0 clamp(5px, 0.8vh, 9px);
+      margin: clamp(2px, 0.5vh, 6px) 0 clamp(4px, 0.7vh, 8px);
     }
 
     .main-download-btn {
-      background: #000000;
-      color: #FFFFFF;
-      border: 2px solid var(--border-color);
+      background-color: var(--neon-lime);
+      color: #000000;
+      border: 2.5px solid var(--border-color);
       border-radius: 9999px;
-      padding: clamp(7px, 1.1vh, 11px) clamp(24px, 3.2vw, 42px);
+      padding: clamp(8px, 1.25vh, 13px) clamp(26px, 3.5vw, 44px);
       font-family: var(--font-display);
-      font-size: clamp(13px, 1.8vh, 17px);
+      font-size: clamp(14px, 2.1vh, 20px);
       letter-spacing: 0.8px;
       text-transform: uppercase;
       text-decoration: none;
       display: inline-flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
       cursor: pointer;
-      box-shadow: 0 4px 0 var(--neon-lime), 0 5px 10px rgba(0,0,0,0.12);
+      box-shadow: 3px 4px 0 var(--border-color);
       transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .main-download-btn:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 5px 0 var(--neon-lime), 0 7px 14px rgba(0,0,0,0.16);
-      color: var(--neon-lime);
+      transform: translateY(-2px);
+      box-shadow: 3px 6px 0 var(--border-color);
+      background-color: #D4FF24;
     }
 
     .main-download-btn:active {
-      transform: translateY(3px);
-      box-shadow: 0 1px 0 var(--neon-lime);
+      transform: translateY(2px);
+      box-shadow: 1px 1px 0 var(--border-color);
     }
 
     .main-download-btn svg {
-      width: clamp(14px, 1.9vh, 17px);
-      height: clamp(14px, 1.9vh, 17px);
+      width: clamp(16px, 2.2vh, 21px);
+      height: clamp(16px, 2.2vh, 21px);
       stroke-width: 2.5;
     }
 
     /* ==========================================================================
-       5. CARD INFERIOR: PRONTO PARA BAIXAR E INSTALAR?
+       5. CARD INFERIOR: SUPORTE / PRIMEIRO ACESSO (COMPACTO E RETANGULAR)
        ========================================================================== */
+    .bottom-callout-wrapper {
+      display: flex;
+      justify-content: center;
+      width: 100%;
+      margin-bottom: clamp(3px, 0.5vh, 6px);
+      flex-shrink: 0;
+    }
+
     .bottom-callout-card {
       background: var(--card-bg);
       border: 2px solid var(--border-color);
       border-radius: clamp(10px, 1.4vh, 14px);
-      padding: clamp(6px, 1vh, 11px) clamp(12px, 1.6vw, 20px);
+      padding: clamp(6px, 1.1vh, 12px) clamp(14px, 1.8vw, 22px);
       box-shadow: 3px 3px 0 var(--border-color);
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 14px;
-      flex-shrink: 0;
-      margin-bottom: clamp(3px, 0.5vh, 6px);
+      gap: 16px;
+      width: 100%;
+      max-width: 680px; /* Alinhado à largura compacta dos cards */
     }
 
     .callout-info-side {
@@ -670,7 +446,7 @@
 
     .callout-title {
       font-family: var(--font-display);
-      font-size: clamp(15px, 2vh, 20px);
+      font-size: clamp(14px, 1.9vh, 19px);
       letter-spacing: 0.5px;
       color: var(--text-main);
       text-transform: uppercase;
@@ -679,9 +455,9 @@
     }
 
     .callout-desc {
-      font-size: clamp(9.5px, 1.15vh, 11.5px);
+      font-size: clamp(9px, 1.15vh, 11px);
       color: var(--text-sub);
-      max-width: 480px;
+      max-width: 400px;
       line-height: 1.25;
     }
 
@@ -750,6 +526,7 @@
       gap: 10px;
       flex-wrap: wrap;
       flex-shrink: 0;
+      width: 100%;
     }
 
     .footer-links {
@@ -906,7 +683,7 @@
     /* ==========================================================================
        RESPONSIVIDADE (MOBILE / TELAS VERTICAIS)
        ========================================================================== */
-    @media (max-width: 960px) {
+    @media (max-width: 768px) {
       body {
         height: auto;
         min-height: 100vh;
@@ -920,12 +697,12 @@
 
       .mockup-grid {
         grid-template-columns: 1fr;
+        max-width: 320px;
         gap: 16px;
       }
 
       .mockup-card {
-        height: auto;
-        min-height: 220px;
+        height: 220px;
       }
 
       .bottom-callout-card {
@@ -1001,35 +778,41 @@
   <div class="app-container">
 
     <!-- ====================================================================
-         1. CABEÇALHO / TOP NAVIGATION
+         1. CABEÇALHO / TOP NAVIGATION (COM PREPARAÇÃO PARA LOGO DIREITA)
          ==================================================================== -->
     <header class="site-nav">
       <a href="#" class="brand-logo-wrap" aria-label="Robin Minerador">
-        <div class="brand-icon-box">
-          <!-- Silhueta Oficial do Pássaro Robin -->
-          <svg viewBox="0 0 24 24" fill="currentColor">
-            <path d="M21.5 8.5c-.3-.2-1.7-.8-3.2-.2-1.2.5-2.2 1.5-2.8 2.2-.8-1.5-2.4-2.5-4.2-2.5-2.5 0-4.6 1.9-4.8 4.4-.8.4-1.5 1-2.1 1.7-.8-.3-1.8-.4-2.8.2-.8.5-1.1 1.4-1.4 2.2 1.5.1 2.8-.4 3.7-1 .5 1.5 1.7 2.7 3.3 3.3 2.1.8 4.4.5 6.2-.8 2.8-2 4.3-5.3 4.5-8.5.8-.2 2.6-.4 3.6-1z"/>
-            <circle cx="16" cy="11.5" r="1.2" fill="#C8FF00"/>
-          </svg>
+        <div class="brand-icon-box" id="headerLeftLogoBox">
+          <img src="assets/new-logo.jpg" alt="Robin Logo" id="brandLogoImg" />
         </div>
         <span class="brand-title-text">ROBIN MINERADOR</span>
       </a>
 
-      <button type="button" class="nav-download-btn js-btn-download" aria-label="Baixar Aplicativo">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-          <polyline points="7 10 12 15 17 10"></polyline>
-          <line x1="12" y1="15" x2="12" y2="3"></line>
-        </svg>
-        <span>DOWNLOAD APP</span>
-      </button>
+      <div class="nav-right-wrap">
+        <button type="button" class="nav-download-btn js-btn-download" aria-label="Baixar Aplicativo">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          <span>DOWNLOAD APP</span>
+        </button>
+
+        <!-- Slot Preparado para Logo do Canto Superior Direito -->
+        <div class="header-right-logo-slot" id="headerRightLogoSlot" title="Logo Superior Direito">
+          <img src="assets/new-logo.jpg" alt="Logo Superior Direito" id="headerRightLogoImg" />
+        </div>
+      </div>
     </header>
 
     <!-- ====================================================================
-         2. HERO / APRESENTAÇÃO
+         2. HERO / TÍTULO PRINCIPAL & SUBTÍTULO
          ==================================================================== -->
     <section class="hero-section">
-      <div class="hero-kicker">FERRAMENTA DE MINERAÇÃO DE CONTEÚDO VIRAL</div>
+      <!-- 2. Subtítulo atualizado: SEJA BEM VINDO AO -->
+      <div class="hero-kicker">SEJA BEM VINDO AO</div>
+
+      <!-- 1. Título principal aumentado com mais destaque -->
       <h1 class="hero-main-title">ROBIN MINERADOR</h1>
 
       <!-- FITA CONTINUA PONTILHADA -->
@@ -1046,237 +829,92 @@
     </section>
 
     <!-- ====================================================================
-         3. GRID DOS 3 CARDS ILUSTRATIVOS (COMPACTOS)
+         3 & 4. GRID COM OS 3 CARDS CENTRAIS (LARGURA REDUZIDA E IMAGENS)
          ==================================================================== -->
-    <section class="mockup-grid">
+    <section class="mockup-grid-wrapper">
+      <div class="mockup-grid">
 
-      <!-- CARD 1: ENCONTRE PERFIS -->
-      <div class="mockup-card">
-        <div class="card-badge-pill">
-          <span class="card-badge-dot"></span>
-          <span>ENCONTRE PERFIS</span>
-        </div>
-
-        <div class="search-mock-bar">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="11" cy="11" r="8"></circle>
-            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-          </svg>
-          <input type="text" class="search-mock-input" placeholder="Buscar perfis, @usuario..." value="Buscar perfis, @usuario..." readonly />
-        </div>
-
-        <div class="profile-list-mock">
-          <!-- Perfil 1 -->
-          <div class="profile-row-mock">
-            <div class="profile-avatar-and-info">
-              <img src="https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?w=100&auto=format&fit=crop&q=80" alt="Avatar Perfil" class="profile-avatar" />
-              <div class="profile-skeleton-bars">
-                <div class="skeleton-bar-top" style="width: 75px;"></div>
-                <div class="skeleton-bar-bottom" style="width: 42px;"></div>
-              </div>
-            </div>
-            <button type="button" class="profile-action-btn" aria-label="Buscar perfil">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="11" cy="11" r="8"></circle>
-                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-              </svg>
-            </button>
+        <!-- CARD 1: ENCONTRE PERFIS -->
+        <div class="mockup-card" id="cardProfiles">
+          <div class="card-badge-pill">
+            <span class="card-badge-dot"></span>
+            <span>ENCONTRE PERFIS</span>
           </div>
 
-          <!-- Perfil 2 -->
-          <div class="profile-row-mock">
-            <div class="profile-avatar-and-info">
-              <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100&auto=format&fit=crop&q=80" alt="Avatar Perfil" class="profile-avatar" />
-              <div class="profile-skeleton-bars">
-                <div class="skeleton-bar-top" style="width: 68px;"></div>
-                <div class="skeleton-bar-bottom" style="width: 38px;"></div>
-              </div>
-            </div>
-            <button type="button" class="profile-action-btn" aria-label="Buscar perfil">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="11" cy="11" r="8"></circle>
-                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-              </svg>
-            </button>
-          </div>
-
-          <!-- Perfil 3 -->
-          <div class="profile-row-mock">
-            <div class="profile-avatar-and-info">
-              <img src="https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=100&auto=format&fit=crop&q=80" alt="Avatar Perfil" class="profile-avatar" />
-              <div class="profile-skeleton-bars">
-                <div class="skeleton-bar-top" style="width: 72px;"></div>
-                <div class="skeleton-bar-bottom" style="width: 44px;"></div>
-              </div>
-            </div>
-            <button type="button" class="profile-action-btn" aria-label="Buscar perfil">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="11" cy="11" r="8"></circle>
-                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-              </svg>
-            </button>
+          <div class="card-media-container" id="cardMediaContainer1">
+            <img src="assets/card1.jpg" alt="Encontre Perfis - Robin Minerador" class="card-image-content" id="cardImage1" />
           </div>
         </div>
+
+        <!-- CARD 2: VÍDEOS COM POTENCIAL -->
+        <div class="mockup-card" id="cardVideos">
+          <div class="card-badge-pill">
+            <span class="card-badge-dot"></span>
+            <span>VÍDEOS COM POTENCIAL</span>
+          </div>
+
+          <div class="card-media-container" id="cardMediaContainer2">
+            <img src="assets/card2.png" alt="Vídeos com Potencial - Robin Minerador" class="card-image-content" id="cardImage2" />
+          </div>
+        </div>
+
+        <!-- CARD 3: BAIXE EM MASSA -->
+        <div class="mockup-card" id="cardBatchDownload">
+          <div class="card-badge-pill">
+            <span class="card-badge-dot"></span>
+            <span>BAIXE EM MASSA</span>
+          </div>
+
+          <div class="card-media-container" id="cardMediaContainer3">
+            <img src="assets/card3.jpg" alt="Baixe em Massa - Robin Minerador" class="card-image-content" id="cardImage3" />
+          </div>
+        </div>
+
       </div>
-
-      <!-- CARD 2: VÍDEOS COM POTENCIAL -->
-      <div class="mockup-card">
-        <div class="card-badge-pill">
-          <span class="card-badge-dot"></span>
-          <span>VÍDEOS COM POTENCIAL</span>
-        </div>
-
-        <div class="video-grid-mock">
-          <!-- Vídeo 1 (Pôr do Sol no Mar) -->
-          <div class="video-item-mock">
-            <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=300&auto=format&fit=crop&q=80" alt="Vídeo Viral 1" class="video-thumb-img" />
-            <div class="video-play-center">
-              <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-            </div>
-            <div class="video-views-badge">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
-              <span>1,2M</span>
-            </div>
-          </div>
-
-          <!-- Vídeo 2 (Cachoeira) -->
-          <div class="video-item-mock">
-            <img src="https://images.unsplash.com/photo-1432405972618-c60b0225b8f9?w=300&auto=format&fit=crop&q=80" alt="Vídeo Viral 2" class="video-thumb-img" />
-            <div class="video-play-center">
-              <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-            </div>
-            <div class="video-views-badge">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
-              <span>856K</span>
-            </div>
-          </div>
-
-          <!-- Vídeo 3 (Cidade ao Pôr do Sol) -->
-          <div class="video-item-mock">
-            <img src="https://images.unsplash.com/photo-1519501025264-65ba15a82390?w=300&auto=format&fit=crop&q=80" alt="Vídeo Viral 3" class="video-thumb-img" />
-            <div class="video-play-center">
-              <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-            </div>
-            <div class="video-views-badge">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
-              <span>2,4M</span>
-            </div>
-          </div>
-
-          <!-- Vídeo 4 (Praia Tropical) -->
-          <div class="video-item-mock">
-            <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=300&auto=format&fit=crop&q=80" alt="Vídeo Viral 4" class="video-thumb-img" />
-            <div class="video-play-center">
-              <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-            </div>
-            <div class="video-views-badge">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
-              <span>1,8M</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- CARD 3: BAIXE EM MASSA -->
-      <div class="mockup-card">
-        <div class="card-badge-pill">
-          <span class="card-badge-dot"></span>
-          <span>BAIXE EM MASSA</span>
-        </div>
-
-        <div class="toggles-list-mock">
-          <!-- Toggle Instagram -->
-          <div class="toggle-row-mock">
-            <div class="toggle-network-info">
-              <div class="network-icon-box network-icon-instagram">
-                <svg viewBox="0 0 24 24">
-                  <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-                </svg>
-              </div>
-              <span class="network-name-label">Instagram</span>
-            </div>
-            <label class="switch-wrapper" aria-label="Ativar Instagram">
-              <input type="checkbox" checked />
-              <span class="switch-slider"></span>
-            </label>
-          </div>
-
-          <!-- Toggle TikTok -->
-          <div class="toggle-row-mock">
-            <div class="toggle-network-info">
-              <div class="network-icon-box network-icon-tiktok">
-                <svg viewBox="0 0 24 24">
-                  <path d="M19.589 6.686a4.793 4.793 0 0 1-3.77-4.245V2h-3.445v13.672a2.896 2.896 0 0 1-5.201 1.743 2.89 2.89 0 0 1 2.314-4.636c.314 0 .618.05.903.144v-3.53a6.377 6.377 0 0 0-.903-.065 6.335 6.335 0 0 0-6.336 6.335 6.337 6.337 0 0 0 10.781 4.542 6.275 6.275 0 0 0 1.887-4.494V8.411c1.472.937 3.204 1.493 5.06 1.547V6.52c-.443.033-.878.109-1.293.166z"/>
-                </svg>
-              </div>
-              <span class="network-name-label">TikTok</span>
-            </div>
-            <label class="switch-wrapper" aria-label="Ativar TikTok">
-              <input type="checkbox" checked />
-              <span class="switch-slider"></span>
-            </label>
-          </div>
-
-          <!-- Toggle YouTube Shorts -->
-          <div class="toggle-row-mock">
-            <div class="toggle-network-info">
-              <div class="network-icon-box network-icon-youtube">
-                <svg viewBox="0 0 24 24">
-                  <path d="M10 15l5.19-3L10 9v6m11.56-7.83c.13.47.22 1.1.28 1.9.07.8.1 1.49.1 2.09L22 12c0 2.19-.16 3.8-.44 4.83-.25.9-.83 1.48-1.73 1.73-.47.13-1.33.22-2.65.28-1.3.07-2.49.1-3.59.1L12 22c-4.19 0-6.8-.16-7.83-.44-.9-.25-1.48-.83-1.73-1.73-.13-.47-.22-1.1-.28-1.9-.07-.8-.1-1.49-.1-2.09L2 12c0-2.19.16-3.8.44-4.83.25-.9.83-1.48 1.73-1.73.47-.13 1.33-.22 2.65-.28 1.3-.07 2.49-.1 3.59-.1L12 2c4.19 0 6.8.16 7.83.44.9.25 1.48.83 1.73 1.73z"/>
-                </svg>
-              </div>
-              <span class="network-name-label">YouTube Shorts</span>
-            </div>
-            <label class="switch-wrapper" aria-label="Ativar YouTube Shorts">
-              <input type="checkbox" checked />
-              <span class="switch-slider"></span>
-            </label>
-          </div>
-        </div>
-      </div>
-
     </section>
 
     <!-- ====================================================================
-         4. BOTÃO CENTRAL DE DOWNLOAD GIGANTE
+         5. BOTÃO PRINCIPAL CENTRAL: BAIXE CLICANDO AQUI
          ==================================================================== -->
     <div class="center-cta-wrap">
-      <button type="button" class="main-download-btn js-btn-download" aria-label="Download do Aplicativo">
+      <button type="button" class="main-download-btn js-btn-download" aria-label="Baixe Clicando Aqui">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
           <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
           <polyline points="7 10 12 15 17 10"></polyline>
           <line x1="12" y1="15" x2="12" y2="3"></line>
         </svg>
-        <span>DOWNLOAD APP</span>
+        <span>BAIXE CLICANDO AQUI</span>
       </button>
     </div>
 
     <!-- ====================================================================
-         5. CARD INFERIOR: PRIMEIRO ACESSO / WHATSAPP
+         6. CARD INFERIOR: SUPORTE / PRIMEIRO ACESSO (COMPACTO E RETANGULAR)
          ==================================================================== -->
-    <section class="bottom-callout-card">
-      <div class="callout-info-side">
-        <div class="callout-badge-pill">
-          <span class="card-badge-dot"></span>
-          <span>PRIMEIRO ACESSO</span>
+    <div class="bottom-callout-wrapper">
+      <section class="bottom-callout-card">
+        <div class="callout-info-side">
+          <div class="callout-badge-pill">
+            <span class="card-badge-dot"></span>
+            <span>PRIMEIRO ACESSO</span>
+          </div>
+          <h2 class="callout-title">PRONTO PARA BAIXAR E INSTALAR?</h2>
+          <p class="callout-desc">
+            Faça o download do aplicativo para começar sua mineração de conteúdo viral com praticidade.
+          </p>
         </div>
-        <h2 class="callout-title">PRONTO PARA BAIXAR E INSTALAR?</h2>
-        <p class="callout-desc">
-          Faça o download do aplicativo para começar sua mineração de conteúdo viral com praticidade.
-        </p>
-      </div>
 
-      <div class="callout-action-side">
-        <a href="https://wa.me/5511999999999?text=Ol%C3%A1!%20Preciso%20de%20ajuda%20para%20instalar%20o%20Robin%20Minerador." target="_blank" rel="noopener noreferrer" class="whatsapp-btn">
-          <!-- Ícone do WhatsApp -->
-          <svg viewBox="0 0 24 24">
-            <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.006c.106.005.249-.04.39.298.144.347.491 1.2.534 1.287.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.086-.177.18-.076.354.101.174.449.741.964 1.201.662.591 1.221.774 1.394.86s.275.072.376-.043c.101-.116.433-.506.549-.68.116-.173.231-.145.39-.087s1.011.477 1.184.564.289.13.332.202c.045.072.045.419-.099.824zm-3.423-14.416c-6.627 0-12 5.373-12 12 0 2.164.577 4.195 1.585 5.952l-1.585 5.808 6.002-1.574c1.705.931 3.666 1.464 5.753 1.464 6.627 0 12-5.373 12-12 0-6.627-5.373-12-12-12z"/>
-          </svg>
-          <span>SUPORTE PELO WHATSAPP</span>
-        </a>
-        <span class="whatsapp-subtext">Ajuda rápida para instalação e primeiro uso.</span>
-      </div>
-    </section>
+        <div class="callout-action-side">
+          <a href="https://w.app/robinminerador" target="_blank" rel="noopener noreferrer" class="whatsapp-btn">
+            <!-- Ícone do WhatsApp -->
+            <svg viewBox="0 0 24 24">
+              <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.006c.106.005.249-.04.39.298.144.347.491 1.2.534 1.287.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.086-.177.18-.076.354.101.174.449.741.964 1.201.662.591 1.221.774 1.394.86s.275.072.376-.043c.101-.116.433-.506.549-.68.116-.173.231-.145.39-.087s1.011.477 1.184.564.289.13.332.202c.045.072.045.419-.099.824zm-3.423-14.416c-6.627 0-12 5.373-12 12 0 2.164.577 4.195 1.585 5.952l-1.585 5.808 6.002-1.574c1.705.931 3.666 1.464 5.753 1.464 6.627 0 12-5.373 12-12 0-6.627-5.373-12-12-12z"/>
+            </svg>
+            <span>SUPORTE PELO WHATSAPP</span>
+          </a>
+          <span class="whatsapp-subtext">Ajuda rápida para instalação e primeiro uso.</span>
+        </div>
+      </section>
+    </div>
 
     <!-- ====================================================================
          6. RODAPÉ
