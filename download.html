@@ -1,0 +1,1297 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ROBIN MINERADOR | Baixe o Aplicativo Oficial</title>
+  <meta name="description" content="Faça o download oficial do Robin Minerador - Ferramenta de mineração de conteúdo viral para Instagram Reels, TikTok e YouTube Shorts.">
+  <meta name="theme-color" content="#C8FF00">
+  <link rel="icon" type="image/png" href="assets/robin-icon.png">
+
+  <!-- Google Fonts: Anton (Impact/Display) e Inter (Clean Sans-Serif) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    /* ==========================================================================
+       RESET E VARIÁVEIS VISUAIS
+       ========================================================================== */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg-page: #E9EFF1;
+      --card-bg: #FFFFFF;
+      --border-color: #000000;
+      --neon-lime: #C8FF00;
+      --neon-lime-glow: rgba(200, 255, 0, 0.4);
+      --text-main: #000000;
+      --text-muted: #6B7280;
+      --text-sub: #4B5563;
+      --blue-toggle: #1877F2;
+      --font-display: 'Anton', sans-serif;
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 16px 40px;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    /* Container Central Alinhado ao Mockup */
+    .app-container {
+      width: 100%;
+      max-width: 1140px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ==========================================================================
+       1. CABEÇALHO / NAVBAR SUPERIOR
+       ========================================================================== */
+    .site-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      margin-bottom: 28px;
+    }
+
+    .brand-logo-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--text-main);
+    }
+
+    .brand-icon-box {
+      width: 42px;
+      height: 42px;
+      background-color: var(--neon-lime);
+      border: 2px solid var(--border-color);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 2px 2px 0 var(--border-color);
+      flex-shrink: 0;
+    }
+
+    .brand-icon-box svg {
+      width: 24px;
+      height: 24px;
+      fill: #000000;
+    }
+
+    .brand-title-text {
+      font-family: var(--font-display);
+      font-size: 24px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      line-height: 1;
+    }
+
+    .nav-download-btn {
+      background: #FFFFFF;
+      border: 2px solid var(--border-color);
+      border-radius: 9999px;
+      padding: 10px 24px;
+      font-family: var(--font-display);
+      font-size: 15px;
+      letter-spacing: 0.5px;
+      color: var(--text-main);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      box-shadow: 2px 2px 0 var(--border-color);
+      transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .nav-download-btn:hover {
+      background-color: #F8F9FA;
+      transform: translateY(-2px);
+      box-shadow: 2px 4px 0 var(--border-color);
+    }
+
+    .nav-download-btn:active {
+      transform: translateY(1px);
+      box-shadow: 1px 1px 0 var(--border-color);
+    }
+
+    .nav-download-btn svg {
+      width: 16px;
+      height: 16px;
+      stroke-width: 2.5;
+    }
+
+    /* ==========================================================================
+       2. HERO / TÍTULO PRINCIPAL & BANNER
+       ========================================================================== */
+    .hero-section {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 28px;
+    }
+
+    .hero-kicker {
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      color: #1F2937;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .hero-main-title {
+      font-family: var(--font-display);
+      font-size: clamp(48px, 8.5vw, 92px);
+      line-height: 0.95;
+      letter-spacing: 1.5px;
+      color: var(--text-main);
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+
+    /* Faixa de fita / Ticker com bordas tracejadas */
+    .ticker-ribbon-wrap {
+      width: 100%;
+      background: #FFFFFF;
+      border-top: 1.5px dashed var(--border-color);
+      border-bottom: 1.5px dashed var(--border-color);
+      padding: 10px 0;
+      margin: 6px 0 24px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transform: rotate(-0.3deg);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+    }
+
+    .ticker-ribbon-text {
+      font-size: clamp(10px, 1.4vw, 13px);
+      font-weight: 900;
+      letter-spacing: 2px;
+      color: var(--text-main);
+      text-transform: uppercase;
+      white-space: nowrap;
+      text-align: center;
+      padding: 0 10px;
+    }
+
+    /* Caixa Neon Destaque: BAIXE O APP. */
+    .neon-download-box {
+      background-color: var(--neon-lime);
+      border: 2.5px solid var(--border-color);
+      border-radius: 8px;
+      padding: 10px 42px;
+      display: inline-block;
+      box-shadow: 4px 4px 0 var(--border-color);
+      transform: rotate(-0.2deg);
+    }
+
+    .neon-download-text {
+      font-family: var(--font-display);
+      font-size: clamp(36px, 5.5vw, 56px);
+      line-height: 1;
+      letter-spacing: 1px;
+      color: var(--text-main);
+      text-transform: uppercase;
+    }
+
+    /* ==========================================================================
+       3. GRID COM OS 3 CARDS DO MOCKUP
+       ========================================================================== */
+    .mockup-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-bottom: 32px;
+    }
+
+    .mockup-card {
+      background: var(--card-bg);
+      border: 2.5px solid var(--border-color);
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: 4px 4px 0 var(--border-color);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* Pílula de cabeçalho do card */
+    .card-badge-pill {
+      background-color: #000000;
+      color: #FFFFFF;
+      border-radius: 9999px;
+      padding: 6px 18px;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      align-self: center;
+      margin-bottom: 18px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .card-badge-dot {
+      width: 8px;
+      height: 8px;
+      background-color: var(--neon-lime);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--neon-lime);
+      flex-shrink: 0;
+    }
+
+    /* CARD 1: ENCONTRE PERFIS */
+    .search-mock-bar {
+      background: #FFFFFF;
+      border: 1.5px solid var(--border-color);
+      border-radius: 9999px;
+      padding: 8px 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+      box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
+    }
+
+    .search-mock-bar svg {
+      width: 16px;
+      height: 16px;
+      color: #111827;
+      flex-shrink: 0;
+    }
+
+    .search-mock-input {
+      border: none;
+      background: transparent;
+      outline: none;
+      font-size: 13px;
+      color: var(--text-main);
+      width: 100%;
+      font-family: var(--font-sans);
+    }
+
+    .search-mock-input::placeholder {
+      color: #9CA3AF;
+    }
+
+    .profile-list-mock {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .profile-row-mock {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 0;
+      border-bottom: 1px solid #F3F4F6;
+    }
+
+    .profile-row-mock:last-child {
+      border-bottom: none;
+    }
+
+    .profile-avatar-and-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .profile-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 1.5px solid var(--border-color);
+      flex-shrink: 0;
+    }
+
+    .profile-skeleton-bars {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .skeleton-bar-top {
+      height: 10px;
+      background-color: #D1D5DB;
+      border-radius: 5px;
+    }
+
+    .skeleton-bar-bottom {
+      height: 8px;
+      background-color: #E5E7EB;
+      border-radius: 4px;
+    }
+
+    .profile-action-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      border: 1.5px solid var(--border-color);
+      background: #FFFFFF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: #111827;
+      box-shadow: 1px 1px 0 var(--border-color);
+    }
+
+    /* CARD 2: VÍDEOS COM POTENCIAL */
+    .video-grid-mock {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .video-item-mock {
+      position: relative;
+      aspect-ratio: 1;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1.5px solid var(--border-color);
+      background-color: #111827;
+    }
+
+    .video-thumb-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.3s ease;
+    }
+
+    .video-item-mock:hover .video-thumb-img {
+      transform: scale(1.05);
+    }
+
+    .video-play-center {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 30px;
+      height: 30px;
+      background: rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(4px);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #FFFFFF;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .video-play-center svg {
+      width: 14px;
+      height: 14px;
+      fill: #FFFFFF;
+      margin-left: 2px;
+    }
+
+    .video-views-badge {
+      position: absolute;
+      bottom: 6px;
+      left: 6px;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(4px);
+      color: #FFFFFF;
+      font-size: 10px;
+      font-weight: 800;
+      padding: 3px 6px;
+      border-radius: 5px;
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+    }
+
+    .video-views-badge svg {
+      width: 10px;
+      height: 10px;
+      stroke-width: 2.5;
+    }
+
+    /* CARD 3: BAIXE EM MASSA */
+    .toggles-list-mock {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 4px;
+    }
+
+    .toggle-row-mock {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 14px;
+      background: #FFFFFF;
+      border: 1.5px solid var(--border-color);
+      border-radius: 12px;
+      box-shadow: 2px 2px 0 rgba(0,0,0,0.05);
+    }
+
+    .toggle-network-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .network-icon-box {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .network-icon-instagram {
+      background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%);
+      color: #FFFFFF;
+    }
+
+    .network-icon-tiktok {
+      background-color: #000000;
+      color: #FFFFFF;
+    }
+
+    .network-icon-youtube {
+      background-color: #FF0000;
+      color: #FFFFFF;
+    }
+
+    .network-icon-box svg {
+      width: 20px;
+      height: 20px;
+      fill: currentColor;
+    }
+
+    .network-name-label {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    /* Switch iOS / Moderno */
+    .switch-wrapper {
+      position: relative;
+      width: 46px;
+      height: 26px;
+      cursor: pointer;
+    }
+
+    .switch-wrapper input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .switch-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #D1D5DB;
+      transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      border-radius: 9999px;
+      border: 1.5px solid var(--border-color);
+    }
+
+    .switch-slider::before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 2px;
+      bottom: 2px;
+      background-color: #FFFFFF;
+      transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      border-radius: 50%;
+      border: 1px solid rgba(0,0,0,0.2);
+    }
+
+    .switch-wrapper input:checked + .switch-slider {
+      background-color: var(--blue-toggle);
+    }
+
+    .switch-wrapper input:checked + .switch-slider::before {
+      transform: translateX(20px);
+    }
+
+    /* ==========================================================================
+       4. BOTÃO CENTRAL GIGANTE DE DOWNLOAD
+       ========================================================================== */
+    .center-cta-wrap {
+      display: flex;
+      justify-content: center;
+      margin: 10px 0 32px;
+    }
+
+    .main-download-btn {
+      background: #000000;
+      color: #FFFFFF;
+      border: 2.5px solid var(--border-color);
+      border-radius: 9999px;
+      padding: 16px 54px;
+      font-family: var(--font-display);
+      font-size: 22px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      box-shadow: 0 6px 0 var(--neon-lime), 0 8px 16px rgba(0,0,0,0.15);
+      transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .main-download-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 0 var(--neon-lime), 0 12px 20px rgba(0,0,0,0.2);
+      color: var(--neon-lime);
+    }
+
+    .main-download-btn:active {
+      transform: translateY(4px);
+      box-shadow: 0 2px 0 var(--neon-lime);
+    }
+
+    .main-download-btn svg {
+      width: 22px;
+      height: 22px;
+      stroke-width: 2.5;
+    }
+
+    /* ==========================================================================
+       5. CARD INFERIOR: PRONTO PARA BAIXAR E INSTALAR?
+       ========================================================================== */
+    .bottom-callout-card {
+      background: var(--card-bg);
+      border: 2.5px solid var(--border-color);
+      border-radius: 20px;
+      padding: 26px 36px;
+      box-shadow: 4px 4px 0 var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 28px;
+    }
+
+    .callout-info-side {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .callout-badge-pill {
+      background-color: #000000;
+      color: #FFFFFF;
+      border-radius: 9999px;
+      padding: 5px 16px;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .callout-title {
+      font-family: var(--font-display);
+      font-size: clamp(24px, 3.5vw, 32px);
+      letter-spacing: 0.5px;
+      color: var(--text-main);
+      text-transform: uppercase;
+      line-height: 1.1;
+      margin-bottom: 6px;
+    }
+
+    .callout-desc {
+      font-size: 14px;
+      color: var(--text-sub);
+      max-width: 540px;
+      line-height: 1.45;
+    }
+
+    .callout-action-side {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .whatsapp-btn {
+      background-color: var(--neon-lime);
+      border: 2.5px solid var(--border-color);
+      border-radius: 9999px;
+      padding: 14px 30px;
+      font-family: var(--font-display);
+      font-size: 16px;
+      letter-spacing: 0.5px;
+      color: var(--text-main);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      box-shadow: 3px 3px 0 var(--border-color);
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+
+    .whatsapp-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 3px 5px 0 var(--border-color);
+      background-color: #D4FF24;
+    }
+
+    .whatsapp-btn:active {
+      transform: translateY(1px);
+      box-shadow: 1px 1px 0 var(--border-color);
+    }
+
+    .whatsapp-btn svg {
+      width: 22px;
+      height: 22px;
+      fill: #000000;
+    }
+
+    .whatsapp-subtext {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 600;
+      margin-top: 6px;
+      text-align: center;
+    }
+
+    /* ==========================================================================
+       6. RODAPÉ
+       ========================================================================== */
+    .site-footer {
+      border-top: 1px solid #CBD5E1;
+      padding-top: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--text-sub);
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .footer-links {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+    }
+
+    .footer-links a {
+      color: var(--text-main);
+      text-decoration: underline;
+      font-weight: 500;
+      transition: color 0.15s ease;
+    }
+
+    .footer-links a:hover {
+      color: #2563EB;
+    }
+
+    /* ==========================================================================
+       MODAL DE FEEDBACK DE DOWNLOAD
+       ========================================================================== */
+    .download-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 9999;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+
+    .download-modal-backdrop.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .download-modal-box {
+      background: #FFFFFF;
+      border: 3px solid var(--border-color);
+      border-radius: 20px;
+      padding: 28px;
+      max-width: 480px;
+      width: 100%;
+      box-shadow: 6px 6px 0 var(--border-color);
+      transform: scale(0.95);
+      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .download-modal-backdrop.active .download-modal-box {
+      transform: scale(1);
+    }
+
+    .modal-head {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .modal-icon-badge {
+      width: 44px;
+      height: 44px;
+      background: var(--neon-lime);
+      border: 2px solid var(--border-color);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 2px 2px 0 var(--border-color);
+    }
+
+    .modal-title {
+      font-family: var(--font-display);
+      font-size: 24px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      line-height: 1;
+    }
+
+    .modal-subtitle {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .modal-progress-bar {
+      height: 10px;
+      background: #E5E7EB;
+      border: 1.5px solid var(--border-color);
+      border-radius: 9999px;
+      overflow: hidden;
+      margin: 16px 0;
+    }
+
+    .modal-progress-fill {
+      height: 100%;
+      width: 0%;
+      background: var(--neon-lime);
+      transition: width 0.8s ease;
+    }
+
+    .instructions-card {
+      background: #F9FAFB;
+      border: 1.5px solid #E5E7EB;
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-bottom: 18px;
+      font-size: 13px;
+    }
+
+    .instructions-card strong {
+      display: block;
+      color: #111827;
+      margin-bottom: 8px;
+      font-size: 13px;
+      text-transform: uppercase;
+    }
+
+    .instructions-card ol {
+      padding-left: 20px;
+      color: #374151;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      line-height: 1.4;
+    }
+
+    .modal-close-btn {
+      width: 100%;
+      background: #000000;
+      color: #FFFFFF;
+      border: 2px solid var(--border-color);
+      border-radius: 9999px;
+      padding: 12px;
+      font-family: var(--font-display);
+      font-size: 16px;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      box-shadow: 2px 2px 0 var(--border-color);
+      transition: all 0.15s ease;
+    }
+
+    .modal-close-btn:hover {
+      background: #1F2937;
+    }
+
+    /* ==========================================================================
+       RESPONSIVIDADE (MOBILE / TABLET)
+       ========================================================================== */
+    @media (max-width: 960px) {
+      .mockup-grid {
+        grid-template-columns: 1fr;
+        gap: 18px;
+      }
+
+      .bottom-callout-card {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 22px;
+      }
+
+      .callout-action-side {
+        width: 100%;
+        align-items: stretch;
+      }
+
+      .whatsapp-btn {
+        justify-content: center;
+      }
+    }
+
+    @media (max-width: 640px) {
+      body {
+        padding: 16px 12px 30px;
+      }
+
+      .hero-main-title {
+        font-size: 42px;
+      }
+
+      .neon-download-text {
+        font-size: 32px;
+      }
+
+      .neon-download-box {
+        padding: 8px 24px;
+      }
+
+      .main-download-btn {
+        width: 100%;
+        justify-content: center;
+        padding: 14px 24px;
+        font-size: 18px;
+      }
+
+      .site-footer {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- MODAL DE DOWNLOAD EM ANDAMENTO -->
+  <div id="downloadModal" class="download-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="download-modal-box">
+      <div class="modal-head">
+        <div class="modal-icon-badge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 24px; height: 24px;">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+        </div>
+        <div>
+          <h3 id="modalTitle" class="modal-title">Download Iniciado!</h3>
+          <p class="modal-subtitle">O arquivo <strong>robin-minerador.zip</strong> começou a baixar.</p>
+        </div>
+      </div>
+
+      <div class="modal-progress-bar">
+        <div id="modalProgressBar" class="modal-progress-fill"></div>
+      </div>
+
+      <div class="instructions-card">
+        <strong>⚡ Como Instalar no seu PC:</strong>
+        <ol>
+          <li>Extraia o arquivo <code>robin-minerador.zip</code> em uma pasta.</li>
+          <li>Abra a pasta <code>COMPANION-WINDOWS</code> e execute <code>INSTALAR-ROBIN-WINDOWS.bat</code>.</li>
+          <li>No Chrome/Edge, acesse <code>chrome://extensions</code>, ative <strong>Modo do desenvolvedor</strong> e clique em <strong>Carregar sem compactação</strong> selecionando a pasta <code>EXTENSAO-ROBIN</code>.</li>
+        </ol>
+      </div>
+
+      <button type="button" class="modal-close-btn" onclick="closeDownloadModal()">ENTENDI, FECHAR JANELA</button>
+    </div>
+  </div>
+
+  <div class="app-container">
+
+    <!-- ====================================================================
+         1. CABEÇALHO / TOP NAVIGATION
+         ==================================================================== -->
+    <header class="site-nav">
+      <a href="#" class="brand-logo-wrap" aria-label="Robin Minerador">
+        <div class="brand-icon-box">
+          <!-- Silhueta Oficial do Pássaro Robin -->
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M21.5 8.5c-.3-.2-1.7-.8-3.2-.2-1.2.5-2.2 1.5-2.8 2.2-.8-1.5-2.4-2.5-4.2-2.5-2.5 0-4.6 1.9-4.8 4.4-.8.4-1.5 1-2.1 1.7-.8-.3-1.8-.4-2.8.2-.8.5-1.1 1.4-1.4 2.2 1.5.1 2.8-.4 3.7-1 .5 1.5 1.7 2.7 3.3 3.3 2.1.8 4.4.5 6.2-.8 2.8-2 4.3-5.3 4.5-8.5.8-.2 2.6-.4 3.6-1z"/>
+            <circle cx="16" cy="11.5" r="1.2" fill="#C8FF00"/>
+          </svg>
+        </div>
+        <span class="brand-title-text">ROBIN MINERADOR</span>
+      </a>
+
+      <button type="button" class="nav-download-btn js-btn-download" aria-label="Baixar Aplicativo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+          <polyline points="7 10 12 15 17 10"></polyline>
+          <line x1="12" y1="15" x2="12" y2="3"></line>
+        </svg>
+        <span>DOWNLOAD APP</span>
+      </button>
+    </header>
+
+    <!-- ====================================================================
+         2. HERO / APRESENTAÇÃO
+         ==================================================================== -->
+    <section class="hero-section">
+      <div class="hero-kicker">FERRAMENTA DE MINERAÇÃO DE CONTEÚDO VIRAL</div>
+      <h1 class="hero-main-title">ROBIN MINERADOR</h1>
+
+      <!-- FITA CONTINUA PONTILHADA -->
+      <div class="ticker-ribbon-wrap">
+        <div class="ticker-ribbon-text">
+          PERFIS &bull; VÍDEOS &bull; REELS &bull; SHORTS &bull; TIKTOK &bull; INSTAGRAM &bull; YOUTUBE &bull; VIRAL &bull; TENDÊNCIAS &bull; BAIXAR EM MASSA
+        </div>
+      </div>
+
+      <!-- BANNER VERDE NEON: BAIXE O APP. -->
+      <div class="neon-download-box">
+        <div class="neon-download-text">BAIXE O APP.</div>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         3. GRID DOS 3 CARDS ILUSTRATIVOS
+         ==================================================================== -->
+    <section class="mockup-grid">
+
+      <!-- CARD 1: ENCONTRE PERFIS -->
+      <div class="mockup-card">
+        <div class="card-badge-pill">
+          <span class="card-badge-dot"></span>
+          <span>ENCONTRE PERFIS</span>
+        </div>
+
+        <div class="search-mock-bar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input type="text" class="search-mock-input" placeholder="Buscar perfis, @usuario..." value="Buscar perfis, @usuario..." readonly />
+        </div>
+
+        <div class="profile-list-mock">
+          <!-- Perfil 1 -->
+          <div class="profile-row-mock">
+            <div class="profile-avatar-and-info">
+              <img src="https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?w=100&auto=format&fit=crop&q=80" alt="Avatar Perfil" class="profile-avatar" />
+              <div class="profile-skeleton-bars">
+                <div class="skeleton-bar-top" style="width: 110px;"></div>
+                <div class="skeleton-bar-bottom" style="width: 60px;"></div>
+              </div>
+            </div>
+            <button type="button" class="profile-action-btn" aria-label="Buscar perfil">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px;">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </button>
+          </div>
+
+          <!-- Perfil 2 -->
+          <div class="profile-row-mock">
+            <div class="profile-avatar-and-info">
+              <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100&auto=format&fit=crop&q=80" alt="Avatar Perfil" class="profile-avatar" />
+              <div class="profile-skeleton-bars">
+                <div class="skeleton-bar-top" style="width: 95px;"></div>
+                <div class="skeleton-bar-bottom" style="width: 50px;"></div>
+              </div>
+            </div>
+            <button type="button" class="profile-action-btn" aria-label="Buscar perfil">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px;">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </button>
+          </div>
+
+          <!-- Perfil 3 -->
+          <div class="profile-row-mock">
+            <div class="profile-avatar-and-info">
+              <img src="https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=100&auto=format&fit=crop&q=80" alt="Avatar Perfil" class="profile-avatar" />
+              <div class="profile-skeleton-bars">
+                <div class="skeleton-bar-top" style="width: 105px;"></div>
+                <div class="skeleton-bar-bottom" style="width: 65px;"></div>
+              </div>
+            </div>
+            <button type="button" class="profile-action-btn" aria-label="Buscar perfil">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px;">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- CARD 2: VÍDEOS COM POTENCIAL -->
+      <div class="mockup-card">
+        <div class="card-badge-pill">
+          <span class="card-badge-dot"></span>
+          <span>VÍDEOS COM POTENCIAL</span>
+        </div>
+
+        <div class="video-grid-mock">
+          <!-- Vídeo 1 (Pôr do Sol no Mar) -->
+          <div class="video-item-mock">
+            <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400&auto=format&fit=crop&q=80" alt="Vídeo Viral 1" class="video-thumb-img" />
+            <div class="video-play-center">
+              <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+            </div>
+            <div class="video-views-badge">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
+              <span>1,2M</span>
+            </div>
+          </div>
+
+          <!-- Vídeo 2 (Cachoeira) -->
+          <div class="video-item-mock">
+            <img src="https://images.unsplash.com/photo-1432405972618-c60b0225b8f9?w=400&auto=format&fit=crop&q=80" alt="Vídeo Viral 2" class="video-thumb-img" />
+            <div class="video-play-center">
+              <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+            </div>
+            <div class="video-views-badge">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
+              <span>856K</span>
+            </div>
+          </div>
+
+          <!-- Vídeo 3 (Cidade ao Pôr do Sol) -->
+          <div class="video-item-mock">
+            <img src="https://images.unsplash.com/photo-1477959858617-67f30bc75b82?w=400&auto=format&fit=crop&q=80" alt="Vídeo Viral 3" class="video-thumb-img" />
+            <div class="video-play-center">
+              <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+            </div>
+            <div class="video-views-badge">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
+              <span>2,4M</span>
+            </div>
+          </div>
+
+          <!-- Vídeo 4 (Praia Tropical) -->
+          <div class="video-item-mock">
+            <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=400&auto=format&fit=crop&q=80" alt="Vídeo Viral 4" class="video-thumb-img" />
+            <div class="video-play-center">
+              <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+            </div>
+            <div class="video-views-badge">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
+              <span>1,8M</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CARD 3: BAIXE EM MASSA -->
+      <div class="mockup-card">
+        <div class="card-badge-pill">
+          <span class="card-badge-dot"></span>
+          <span>BAIXE EM MASSA</span>
+        </div>
+
+        <div class="toggles-list-mock">
+          <!-- Toggle Instagram -->
+          <div class="toggle-row-mock">
+            <div class="toggle-network-info">
+              <div class="network-icon-box network-icon-instagram">
+                <svg viewBox="0 0 24 24">
+                  <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                </svg>
+              </div>
+              <span class="network-name-label">Instagram</span>
+            </div>
+            <label class="switch-wrapper" aria-label="Ativar Instagram">
+              <input type="checkbox" checked />
+              <span class="switch-slider"></span>
+            </label>
+          </div>
+
+          <!-- Toggle TikTok -->
+          <div class="toggle-row-mock">
+            <div class="toggle-network-info">
+              <div class="network-icon-box network-icon-tiktok">
+                <svg viewBox="0 0 24 24">
+                  <path d="M19.589 6.686a4.793 4.793 0 0 1-3.77-4.245V2h-3.445v13.672a2.896 2.896 0 0 1-5.201 1.743 2.89 2.89 0 0 1 2.314-4.636c.314 0 .618.05.903.144v-3.53a6.377 6.377 0 0 0-.903-.065 6.335 6.335 0 0 0-6.336 6.335 6.337 6.337 0 0 0 10.781 4.542 6.275 6.275 0 0 0 1.887-4.494V8.411c1.472.937 3.204 1.493 5.06 1.547V6.52c-.443.033-.878.109-1.293.166z"/>
+                </svg>
+              </div>
+              <span class="network-name-label">TikTok</span>
+            </div>
+            <label class="switch-wrapper" aria-label="Ativar TikTok">
+              <input type="checkbox" checked />
+              <span class="switch-slider"></span>
+            </label>
+          </div>
+
+          <!-- Toggle YouTube Shorts -->
+          <div class="toggle-row-mock">
+            <div class="toggle-network-info">
+              <div class="network-icon-box network-icon-youtube">
+                <svg viewBox="0 0 24 24">
+                  <path d="M10 15l5.19-3L10 9v6m11.56-7.83c.13.47.22 1.1.28 1.9.07.8.1 1.49.1 2.09L22 12c0 2.19-.16 3.8-.44 4.83-.25.9-.83 1.48-1.73 1.73-.47.13-1.33.22-2.65.28-1.3.07-2.49.1-3.59.1L12 22c-4.19 0-6.8-.16-7.83-.44-.9-.25-1.48-.83-1.73-1.73-.13-.47-.22-1.1-.28-1.9-.07-.8-.1-1.49-.1-2.09L2 12c0-2.19.16-3.8.44-4.83.25-.9.83-1.48 1.73-1.73.47-.13 1.33-.22 2.65-.28 1.3-.07 2.49-.1 3.59-.1L12 2c4.19 0 6.8.16 7.83.44.9.25 1.48.83 1.73 1.73z"/>
+                </svg>
+              </div>
+              <span class="network-name-label">YouTube Shorts</span>
+            </div>
+            <label class="switch-wrapper" aria-label="Ativar YouTube Shorts">
+              <input type="checkbox" checked />
+              <span class="switch-slider"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ====================================================================
+         4. BOTÃO CENTRAL DE DOWNLOAD GIGANTE
+         ==================================================================== -->
+    <div class="center-cta-wrap">
+      <button type="button" class="main-download-btn js-btn-download" aria-label="Download do Aplicativo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+          <polyline points="7 10 12 15 17 10"></polyline>
+          <line x1="12" y1="15" x2="12" y2="3"></line>
+        </svg>
+        <span>DOWNLOAD APP</span>
+      </button>
+    </div>
+
+    <!-- ====================================================================
+         5. CARD INFERIOR: PRIMEIRO ACESSO / WHATSAPP
+         ==================================================================== -->
+    <section class="bottom-callout-card">
+      <div class="callout-info-side">
+        <div class="callout-badge-pill">
+          <span class="card-badge-dot"></span>
+          <span>PRIMEIRO ACESSO</span>
+        </div>
+        <h2 class="callout-title">PRONTO PARA BAIXAR E INSTALAR?</h2>
+        <p class="callout-desc">
+          Faça o download do aplicativo para começar sua mineração de conteúdo viral com praticidade.
+        </p>
+      </div>
+
+      <div class="callout-action-side">
+        <a href="https://wa.me/5511999999999?text=Ol%C3%A1!%20Preciso%20de%20ajuda%20para%20instalar%20o%20Robin%20Minerador." target="_blank" rel="noopener noreferrer" class="whatsapp-btn">
+          <!-- Ícone do WhatsApp -->
+          <svg viewBox="0 0 24 24">
+            <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.006c.106.005.249-.04.39.298.144.347.491 1.2.534 1.287.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.086-.177.18-.076.354.101.174.449.741.964 1.201.662.591 1.221.774 1.394.86s.275.072.376-.043c.101-.116.433-.506.549-.68.116-.173.231-.145.39-.087s1.011.477 1.184.564.289.13.332.202c.045.072.045.419-.099.824zm-3.423-14.416c-6.627 0-12 5.373-12 12 0 2.164.577 4.195 1.585 5.952l-1.585 5.808 6.002-1.574c1.705.931 3.666 1.464 5.753 1.464 6.627 0 12-5.373 12-12 0-6.627-5.373-12-12-12z"/>
+          </svg>
+          <span>SUPORTE PELO WHATSAPP</span>
+        </a>
+        <span class="whatsapp-subtext">Ajuda rápida para instalação e primeiro uso.</span>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         6. RODAPÉ
+         ==================================================================== -->
+    <footer class="site-footer">
+      <div>&copy; 2026 Robin Minerador. Todos os direitos reservados.</div>
+      <div class="footer-links">
+        <a href="#termos" onclick="alert('Termos de Serviço: Uso restrito aos adquirentes autorizados do Robin Minerador.'); return false;">Termos de Serviço</a>
+        <a href="#privacidade" onclick="alert('Política de Privacidade: Seus dados estão seguros e criptografados.'); return false;">Política de Privacidade</a>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- SCRIPT DE DISPARO DO DOWNLOAD AUTOMÁTICO -->
+  <script>
+    // Link direto do ZIP do repositório contendo a versão atualizada
+    const GITHUB_ZIP_URL = "https://github.com/roldolfotubenuti-ui/robin-minerador/archive/refs/heads/main.zip";
+    const LOCAL_ZIP_URL = "robin-minerador.zip";
+
+    function startDownload() {
+      // 1. Abre o modal visual com as instruções de instalação
+      const modal = document.getElementById('downloadModal');
+      const bar = document.getElementById('modalProgressBar');
+      if (modal) modal.classList.add('active');
+      if (bar) {
+        bar.style.width = '0%';
+        setTimeout(() => { bar.style.width = '100%'; }, 100);
+      }
+
+      // 2. Dispara o download automático do arquivo ZIP
+      const link = document.createElement('a');
+      link.href = GITHUB_ZIP_URL;
+      link.setAttribute('download', 'robin-minerador.zip');
+      link.setAttribute('target', '_blank');
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    function closeDownloadModal() {
+      const modal = document.getElementById('downloadModal');
+      if (modal) modal.classList.remove('active');
+    }
+
+    // Vincula todos os botões de Download ao disparador
+    document.querySelectorAll('.js-btn-download').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        startDownload();
+      });
+    });
+
+    // Fecha o modal ao clicar fora da caixa
+    window.addEventListener('click', (e) => {
+      const modal = document.getElementById('downloadModal');
+      if (e.target === modal) {
+        closeDownloadModal();
+      }
+    });
+  </script>
+</body>
+</html>
