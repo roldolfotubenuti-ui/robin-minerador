@@ -297,7 +297,7 @@ namespace RobinCompanion
             }
         }
 
-        private const string BackendPublicKeyXml = "<RSAKeyValue><Modulus>v+DOr++gkTRiEDhvqqdcn/PHIOf0Nbw3sJzIXiKsF1VHYzSz/Rbg9T3DWo8VeRJaLeK/DgOFmewDqzUj+fKrTiNn+fLEVFvy0NVAWjX7kaFptl0kQm+4Ye4LWC/MuZK8MY3AtF/fHeK7LyMsmbeDzjdmpLZhSAM726kQzFNkmA0NPktzbW5O/LS8Fe9FFrKpReJbZOckGyAO5BOy9991BSDuuKtxLThZ2CuvxwxAQNKBLjgl4nZIyDq51b2UlwcDlMtFt7cWcskl1/HsBkIiF4QYcZPYQ9GpqYNZZl0dybbEZGC2D451Zb0YEKwDsUDhkl3Q4M4HbNz6wIA+HD1IQw==</Modulus><Exponent>AQAB</Exponent></RSAKeyValue>";
+        private const string BackendPublicKeyXml = "<RSAKeyValue><Modulus>juMU0QtOhLfhuyx43Imvpd+q9ETFxYsgg+Xo1aFZIwjMeDrhhpOBju1f58/OqWddusVVitKX78hhWNFkVER1duV0vUtjO3Kr5eTNu44UsTvsm1o0L/f1BdJPrwNQ2yqvuHBcJNjtnHi4T/scTb2nBAVfYyAJm8SSjgtQ+SydAxfQ2FtWCFeYkgSNqbAJsJ8NOjJzGNsb+Mia549AX69ZNtkx/9v6PnMU7HuONfoJ2ix63D5DCmY2d0oFisAkuVrTp77kAZ/31uAtOFN6NvyJPGkgPSh3CnQUGElx+94ZAMOP8OWeIcJtKfFb3KqmCmLWc84q0bWbt+gWtGNNOQswQQ==</Modulus><Exponent>AQAB</Exponent></RSAKeyValue>";
 
         public static bool VerifyDownloadTicket(string userId, string deviceId, long expiresAt, int itemCount, string ticketBase64)
         {
