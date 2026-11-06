@@ -431,40 +431,79 @@
     } catch (_) {}
   }
 
+  let isTogglingDemo = false;
+  async function toggleDemoMode(forcedVal) {
+    if (isTogglingDemo) return;
+    isTogglingDemo = true;
+    const demoPill = $("#demo-pill");
+    const demoCheckbox = $("#setting-demo-mode");
+
+    if (demoPill) {
+      demoPill.style.pointerEvents = "none";
+      demoPill.style.opacity = "0.7";
+    }
+    if (demoCheckbox) {
+      demoCheckbox.disabled = true;
+    }
+
+    try {
+      const nextVal = typeof forcedVal === "boolean" ? forcedVal : !state.settings.demoMode;
+      await updateSettings({ demoMode: nextVal });
+      await detectActiveTabContext();
+    } finally {
+      isTogglingDemo = false;
+      if (demoPill) {
+        demoPill.style.pointerEvents = "auto";
+        demoPill.style.opacity = "1";
+      }
+      if (demoCheckbox) {
+        demoCheckbox.disabled = false;
+      }
+    }
+  }
+
+  let isDetectingContext = false;
   async function detectActiveTabContext() {
-    const [activeTab] = await chrome.tabs.query({ active: true, currentWindow: true });
-    if (activeTab?.id) state.tabId = activeTab.id;
+    if (isDetectingContext) return;
+    isDetectingContext = true;
+    try {
+      const [activeTab] = await chrome.tabs.query({ active: true, currentWindow: true });
+      if (activeTab?.id) state.tabId = activeTab.id;
 
-    if (state.settings.demoMode) {
-      state.platform = state.platform || "instagram";
-      state.profile = state.profile || "criador_demo";
-      state.key = Core.makeContextKey(state.platform, state.profile);
-      $("#detected-platform-label").textContent = `${Core.PLATFORM_NAMES[state.platform]} (DEMO)`;
-      $("#detected-profile-title").textContent = `@${state.profile}`;
-      $("#detected-hint").textContent = "Modo demonstração ativo — clique em Minerar Perfil para testar todo o fluxo.";
-      $("#ready-badge").textContent = "PRONTO (DEMO)";
-      return;
-    }
+      // 1. MODO DEMO ATIVO: Estado determinístico e isolado
+      if (state.settings.demoMode) {
+        state.platform = "instagram";
+        state.profile = "criador_demo";
+        state.key = "instagram::criador_demo";
+        $("#detected-platform-label").textContent = "INSTAGRAM (DEMO)";
+        $("#detected-profile-title").textContent = "@criador_demo";
+        $("#detected-hint").textContent = "Modo demonstração ativo — clique em Minerar Perfil para testar todo o fluxo.";
+        $("#ready-badge").textContent = "PRONTO (DEMO)";
+        return;
+      }
 
-    const parsed = activeTab?.url ? Core.detectPlatformContext(activeTab.url) : null;
-    if (parsed) {
-      state.platform = parsed.platform;
-      state.profile = parsed.profile || "";
-      state.key = parsed.key;
-    } else if (state.profile) {
-      state.key = Core.makeContextKey(state.platform, state.profile);
-    }
-
-    if (state.profile) {
-      $("#detected-platform-label").textContent = Core.PLATFORM_NAMES[state.platform] || "PLATAFORMA";
-      $("#detected-profile-title").textContent = `@${state.profile}`;
-      $("#detected-hint").textContent = `Pronto para minerar ${Core.ITEM_NOUNS[state.platform] || "vídeos"} públicos de @${state.profile}.`;
-      $("#ready-badge").textContent = "PERFIL PRONTO";
-    } else {
-      $("#detected-platform-label").textContent = "AGUARDANDO PÁGINA COMPATÍVEL";
-      $("#detected-profile-title").textContent = "Nenhum perfil detectado";
-      $("#detected-hint").textContent = "Abra um perfil no Instagram, TikTok ou a aba Shorts de um canal no YouTube (ou ative o Modo Demo).";
-      $("#ready-badge").textContent = "ABRA UM PERFIL";
+      // 2. MODO DEMO DESATIVADO: Consulta a aba real ativa
+      const parsed = activeTab?.url ? Core.detectPlatformContext(activeTab.url) : null;
+      if (parsed && parsed.profile && parsed.profile !== "criador_demo") {
+        state.platform = parsed.platform;
+        state.profile = parsed.profile;
+        state.key = parsed.key;
+        $("#detected-platform-label").textContent = Core.PLATFORM_NAMES[state.platform] || "PLATAFORMA";
+        $("#detected-profile-title").textContent = `@${state.profile}`;
+        $("#detected-hint").textContent = `Pronto para minerar ${Core.ITEM_NOUNS[state.platform] || "vídeos"} públicos de @${state.profile}.`;
+        $("#ready-badge").textContent = "PERFIL PRONTO";
+      } else {
+        // Limpar profile e key antigos quando não houver perfil compatível. Nunca reutilizar criador_demo!
+        state.platform = "";
+        state.profile = "";
+        state.key = "";
+        $("#detected-platform-label").textContent = "AGUARDANDO PÁGINA COMPATÍVEL";
+        $("#detected-profile-title").textContent = "Nenhum perfil detectado";
+        $("#detected-hint").textContent = "Abra um perfil no Instagram, TikTok ou a aba Shorts de um canal no YouTube (ou ative o Modo Demo).";
+        $("#ready-badge").textContent = "ABRA UM PERFIL";
+      }
+    } finally {
+      isDetectingContext = false;
     }
   }
 
@@ -489,8 +528,12 @@
       const card = document.createElement("article");
       card.className = `reel-card${isSelected ? " selected" : ""}${index >= 12 ? " deferred-card" : ""}`;
 
-      const thumbHtml = reel.thumbnail
-        ? `<img src="${reel.thumbnail}" alt="${reel.shortcode}" loading="lazy" />`
+      const thumbSrc = reel.demo
+        ? (reel.thumbnail || `assets/demo_thumb_${(index % 6) + 1}.jpg`)
+        : (reel.thumbnail || "");
+
+      const thumbHtml = thumbSrc
+        ? `<img src="${thumbSrc}" alt="${reel.shortcode}" loading="lazy" />`
         : `<div style="height:100%;display:grid;place-items:center;color:#a855f7;font-weight:800;">ROBIN · ${reel.shortcode}</div>`;
 
       card.innerHTML = `
@@ -530,6 +573,18 @@
 
     $("#selected-counter").textContent = `${state.selected.size} vídeo(s) selecionado(s)`;
     $("#select-all-checkbox").checked = state.reels.length > 0 && state.selected.size === state.reels.length;
+
+    const isAllDemo = state.reels.length > 0 && state.reels.every((r) => r.demo);
+    const dlBtn = $("#btn-download-selected");
+    const dlSub = $("#selected-subtitle");
+    if (dlBtn) {
+      dlBtn.textContent = isAllDemo ? "📦 EXPORTAR PACOTE DEMO (CSV)" : "⬇️ BAIXAR SELECIONADOS";
+    }
+    if (dlSub) {
+      dlSub.textContent = isAllDemo
+        ? "Gerar pacote demonstrativo (ZIP com CSV e orientações)"
+        : "Pronto para empacotar ZIP + CSV";
+    }
 
     const panel = $(".app-left-panel");
     if (panel) panel.scrollTop = 0;
@@ -575,7 +630,109 @@
     }
   }
 
+  let isAnalyzing = false;
+
+  function setAnalysisButtonState(analyzing) {
+    const btn = $("#btn-start-analysis");
+    if (!btn) return;
+    btn.disabled = Boolean(analyzing);
+    if (analyzing) {
+      btn.dataset.prevHtml = btn.innerHTML;
+      btn.innerHTML = `<span>⏳ MINERANDO...</span>`;
+      btn.classList.add("disabled");
+      btn.style.opacity = "0.75";
+      btn.style.pointerEvents = "none";
+    } else {
+      if (btn.dataset.prevHtml) {
+        btn.innerHTML = btn.dataset.prevHtml;
+        delete btn.dataset.prevHtml;
+      } else {
+        btn.innerHTML = `⚡ MINERAR PERFIL AGORA`;
+      }
+      btn.classList.remove("disabled");
+      btn.style.opacity = "1";
+      btn.style.pointerEvents = "auto";
+    }
+  }
+
   async function triggerAnalysis() {
+    if (isAnalyzing) return;
+
+    // 1. MODO DEMO: Execução exclusivamente local, imediata e sem dependência de abas externas
+    if (state.settings.demoMode) {
+      isAnalyzing = true;
+      setAnalysisButtonState(true);
+      try {
+        const limit = Math.min(500, Math.max(1, Number($("#discovery-limit").value) || 50));
+        const sort = $("#discovery-sort").value || "viral";
+        const scope = $("#discovery-scope-mode").value === "all"
+          ? "all"
+          : String(Math.min(5000, Math.max(1, Number($("#discovery-scope-count").value) || 300)));
+
+        const filters = {
+          minViews: $("#filter-min-views").value || "0",
+          minLikes: $("#filter-min-likes").value || "0",
+          minComments: $("#filter-min-comments").value || "0"
+        };
+
+        await updateSettings({
+          discoverySort: sort,
+          maxReels: limit,
+          scanScope: scope,
+          ...filters
+        });
+
+        const demoProfile = "criador_demo";
+        const demoPlatform = "instagram";
+        const demoKey = Core.makeContextKey(demoPlatform, demoProfile);
+        state.platform = demoPlatform;
+        state.profile = demoProfile;
+        state.key = demoKey;
+
+        const demoItems = Core.createDemoDataset(demoProfile, demoPlatform);
+        const filtered = demoItems.filter((item) => Core.matchesFilters(item, filters));
+        const ranked = Core.rankItems(filtered, sort).slice(0, limit);
+
+        state.profiles[demoKey] = {
+          key: demoKey,
+          platform: demoPlatform,
+          profile: demoProfile,
+          reels: ranked,
+          catalogCount: demoItems.length,
+          skippedCount: 0,
+          qualifiedCount: ranked.length,
+          catalogComplete: true,
+          updatedAt: Date.now()
+        };
+
+        await chrome.storage.local.set({ profiles: state.profiles });
+        loadSavedProfile(demoKey);
+        renderHistoryList();
+        return;
+      } finally {
+        isAnalyzing = false;
+        setAnalysisButtonState(false);
+      }
+    }
+
+    // 2. MODO DEMO DESATIVADO: Validação estrita de perfil social real
+    if (!state.profile || state.profile === "criador_demo" || !state.platform) {
+      showToast("Abra um perfil público no Instagram, TikTok ou YouTube (ou ative o Modo Demo).", true);
+      showMinerSubView("view-intro");
+      return;
+    }
+
+    if (!state.tabId) {
+      const [activeTab] = await chrome.tabs.query({ active: true, currentWindow: true });
+      if (activeTab?.id) state.tabId = activeTab.id;
+    }
+
+    if (!state.tabId) {
+      showToast("Aba do perfil não identificada. Recarregue a página do perfil e tente novamente.", true);
+      showMinerSubView("view-intro");
+      return;
+    }
+
     const limit = Math.min(500, Math.max(1, Number($("#discovery-limit").value) || 50));
     const sort = $("#discovery-sort").value || "viral";
     const scope = $("#discovery-scope-mode").value === "all"
@@ -588,55 +745,48 @@
       minComments: $("#filter-min-comments").value || "0"
     };
 
-    await updateSettings({
-      discoverySort: sort,
-      maxReels: limit,
-      scanScope: scope,
-      ...filters
-    });
+    isAnalyzing = true;
+    setAnalysisButtonState(true);
 
-    if (state.settings.demoMode) {
-      const demoItems = Core.createDemoDataset(state.profile || "criador_demo", state.platform);
-      const filtered = demoItems.filter((item) => Core.matchesFilters(item, filters));
-      const ranked = Core.rankItems(filtered, sort).slice(0, limit);
-      state.key = Core.makeContextKey(state.platform, state.profile || "criador_demo");
-      state.profiles[state.key] = {
-        key: state.key,
+    try {
+      await updateSettings({
+        discoverySort: sort,
+        maxReels: limit,
+        scanScope: scope,
+        ...filters
+      });
+
+      // Inicializa os indicadores de progresso dinamicamente
+      $("#analysis-stage-title").textContent = "Iniciando varredura Robin...";
+      $("#analysis-progress-fill").style.width = "5%";
+      $("#analysis-count-label").textContent = `0 / ${limit} vídeos`;
+      $("#analysis-percent-label").textContent = "5%";
+      showMinerSubView("view-progress");
+
+      const resp = await chrome.runtime.sendMessage({
+        type: "START_ANALYSIS",
+        tabId: state.tabId,
         platform: state.platform,
-        profile: state.profile || "criador_demo",
-        reels: ranked,
-        catalogCount: demoItems.length,
-        skippedCount: 0,
-        updatedAt: Date.now()
-      };
-      await chrome.storage.local.set({ profiles: state.profiles });
-      loadSavedProfile(state.key);
-      renderHistoryList();
-      return;
-    }
+        key: state.key,
+        profile: state.profile,
+        limit,
+        sort,
+        scope,
+        filters,
+        blockDuplicates: state.settings.blockDuplicates
+      });
 
-    if (!state.profile || !state.tabId) {
-      showToast("Abra um perfil público no navegador ou ative o Modo Demo.", true);
-      return;
-    }
-
-    showMinerSubView("view-progress");
-    const resp = await chrome.runtime.sendMessage({
-      type: "START_ANALYSIS",
-      tabId: state.tabId,
-      platform: state.platform,
-      key: state.key,
-      profile: state.profile,
-      limit,
-      sort,
-      scope,
-      filters,
-      blockDuplicates: state.settings.blockDuplicates
-    });
-
-    if (!resp?.ok) {
+      if (!resp?.ok) {
+        showMinerSubView("view-intro");
+        showToast(resp?.error || "Falha ao iniciar mineração.", true);
+        isAnalyzing = false;
+        setAnalysisButtonState(false);
+      }
+    } catch (err) {
       showMinerSubView("view-intro");
-      showToast(resp?.error || "Falha ao iniciar mineração.", true);
+      showToast(err.message || "Erro de comunicação ao iniciar mineração.", true);
+      isAnalyzing = false;
+      setAnalysisButtonState(false);
     }
   }
 
@@ -697,12 +847,15 @@
     const batchSize = Math.min(500, Math.max(1, Number($("#batch-size-input").value) || 50));
     await updateSettings({ archiveMode, batchSize });
 
+    const isAllDemo = chosen.every((r) => r.demo);
     renderDownloadDialog({
       status: "running",
       total: chosen.length,
       completed: 0,
       percent: 3,
-      stage: "Iniciando empacotamento Robin..."
+      stage: isAllDemo
+        ? "Preparando exportação demonstrativa (CSV + orientações)..."
+        : "Iniciando empacotamento Robin..."
     });
 
     const resp = await chrome.runtime.sendMessage({
@@ -774,10 +927,7 @@
       btn.addEventListener("click", () => switchTab(btn.dataset.tab));
     });
 
-    $("#demo-pill").addEventListener("click", async () => {
-      await updateSettings({ demoMode: !state.settings.demoMode });
-      await detectActiveTabContext();
-    });
+    $("#demo-pill").addEventListener("click", () => toggleDemoMode());
 
     $("#discovery-scope-mode").addEventListener("change", (e) => {
       const custom = e.target.value === "custom";
@@ -850,10 +1000,7 @@
     $("#setting-block-duplicates").addEventListener("change", (e) => updateSettings({ blockDuplicates: e.target.checked }));
     $("#setting-include-csv").addEventListener("change", (e) => updateSettings({ includeCsv: e.target.checked }));
     $("#setting-save-as").addEventListener("change", (e) => updateSettings({ saveAs: e.target.checked }));
-    $("#setting-demo-mode").addEventListener("change", async (e) => {
-      await updateSettings({ demoMode: e.target.checked });
-      await detectActiveTabContext();
-    });
+    $("#setting-demo-mode").addEventListener("change", (e) => toggleDemoMode(e.target.checked));
 
     // Eventos de Autenticação e Deslogar
     $("#auth-form")?.addEventListener("submit", (e) => {
@@ -1044,18 +1191,26 @@
 
     if (changes.analysisJob?.newValue) {
       const job = changes.analysisJob.newValue;
-      if (job.status === "running" && job.key === state.key) {
+      const isMatch = !job.key || job.key === state.key || (job.profile && job.profile.toLowerCase() === (state.profile || "").toLowerCase());
+
+      if (job.status === "running" && isMatch) {
+        isAnalyzing = true;
+        setAnalysisButtonState(true);
         showMinerSubView("view-progress");
         $("#analysis-stage-title").textContent = job.stage || "Minerando perfil...";
-        $("#analysis-progress-fill").style.width = `${Math.min(100, Math.max(5, Number(job.percent) || 10))}%`;
+        $("#analysis-progress-fill").style.width = `${Math.min(100, Math.max(5, Number(job.percent) || 5))}%`;
         $("#analysis-count-label").textContent = `${job.count || 0} / ${job.limit || 50} vídeos`;
-        $("#analysis-percent-label").textContent = `${Math.round(Number(job.percent) || 10)}%`;
-      } else if (job.status === "complete" && job.key === state.key) {
+        $("#analysis-percent-label").textContent = `${Math.round(Number(job.percent) || 5)}%`;
+      } else if (job.status === "complete" && isMatch) {
+        isAnalyzing = false;
+        setAnalysisButtonState(false);
         const stored = await chrome.storage.local.get("profiles");
         state.profiles = stored.profiles || {};
-        loadSavedProfile(job.key);
+        loadSavedProfile(job.key || state.key);
         renderHistoryList();
-      } else if (job.status === "error" && (!job.key || job.key === state.key)) {
+      } else if (job.status === "error" && isMatch) {
+        isAnalyzing = false;
+        setAnalysisButtonState(false);
         showMinerSubView("view-intro");
         showToast(job.error || "Erro durante a mineração.", true);
       }
@@ -1084,6 +1239,25 @@
     state.profiles = stored.profiles || {};
     state.downloaded = stored.downloaded || {};
     state.authSession = stored.authSession || null;
+
+    // 0. Verificação de segurança de análise em andamento anterior
+    if (stored.analysisJob?.status === "running") {
+      const isStale = Date.now() - (stored.analysisJob.updatedAt || 0) > 75000;
+      if (isStale) {
+        await chrome.storage.local.set({
+          analysisJob: { ...stored.analysisJob, status: "error", error: "Análise anterior expirou por inatividade." }
+        });
+        showMinerSubView("view-intro");
+      } else {
+        isAnalyzing = true;
+        setAnalysisButtonState(true);
+        showMinerSubView("view-progress");
+        $("#analysis-stage-title").textContent = stored.analysisJob.stage || "Minerando perfil...";
+        $("#analysis-progress-fill").style.width = `${Math.min(100, Math.max(5, Number(stored.analysisJob.percent) || 5))}%`;
+        $("#analysis-count-label").textContent = `${stored.analysisJob.count || 0} / ${stored.analysisJob.limit || 50} vídeos`;
+        $("#analysis-percent-label").textContent = `${Math.round(Number(stored.analysisJob.percent) || 5)}%`;
+      }
+    }
 
     // Carregar e-mail lembrado e credenciais configuradas
     try {

@@ -1,4 +1,4 @@
-﻿"use strict";
+"use strict";
 
 importScripts("lib/core.js", "lib/supabase-auth.js");
 
@@ -62,6 +62,49 @@ async function checkCompanionStatus() {
   }
 }
 
+let analysisWatchdogTimer = null;
+let currentAnalysisTabId = null;
+
+function resetAnalysisWatchdog(tabId, key, profile, platform) {
+  clearTimeout(analysisWatchdogTimer);
+  currentAnalysisTabId = tabId || currentAnalysisTabId;
+  analysisWatchdogTimer = setTimeout(async () => {
+    const stored = await chrome.storage.local.get("analysisJob");
+    if (stored.analysisJob?.status === "running") {
+      await setStorageState("analysisJob", {
+        status: "error",
+        platform: platform || stored.analysisJob.platform || "instagram",
+        key: key || stored.analysisJob.key,
+        profile: profile || stored.analysisJob.profile,
+        error: "Tempo limite de coleta excedido. A página do perfil não respondeu.",
+        updatedAt: Date.now()
+      });
+    }
+    clearAnalysisWatchdog();
+  }, 75000);
+}
+
+function clearAnalysisWatchdog() {
+  clearTimeout(analysisWatchdogTimer);
+  analysisWatchdogTimer = null;
+  currentAnalysisTabId = null;
+}
+
+chrome.tabs.onRemoved.addListener(async (closedTabId) => {
+  if (currentAnalysisTabId && closedTabId === currentAnalysisTabId) {
+    clearAnalysisWatchdog();
+    const stored = await chrome.storage.local.get("analysisJob");
+    if (stored.analysisJob?.status === "running") {
+      await setStorageState("analysisJob", {
+        ...stored.analysisJob,
+        status: "error",
+        error: "A aba do perfil foi fechada durante a mineração.",
+        updatedAt: Date.now()
+      });
+    }
+  }
+});
+
 async function injectPlatformScriptsIfNeeded(tabId, platform) {
   try {
     const probe = await chrome.tabs.sendMessage(tabId, { type: "ROBIN_DETECT_CONTEXT" });
@@ -74,8 +117,18 @@ async function injectPlatformScriptsIfNeeded(tabId, platform) {
     youtube: ["lib/core.js", "collectors/youtube.js", "overlay.js"]
   };
   const files = filesByPlatform[platform] || filesByPlatform.instagram;
-  await chrome.scripting.executeScript({ target: { tabId }, files });
-  return await chrome.tabs.sendMessage(tabId, { type: "ROBIN_DETECT_CONTEXT" });
+  try {
+    await chrome.scripting.executeScript({ target: { tabId }, files });
+  } catch (err) {
+    throw new Error(`Não é possível injetar o minerador nesta aba (${err.message}). Certifique-se de que a aba é uma página social pública aberta.`);
+  }
+
+  try {
+    return await chrome.tabs.sendMessage(tabId, { type: "ROBIN_DETECT_CONTEXT" });
+  } catch (_) {
+    await new Promise((r) => setTimeout(r, 150));
+    return await chrome.tabs.sendMessage(tabId, { type: "ROBIN_DETECT_CONTEXT" }).catch(() => null);
+  }
 }
 
 async function handleStartAnalysis(message) {
@@ -84,7 +137,7 @@ async function handleStartAnalysis(message) {
   const profile = String(message.profile || "");
   const key = String(message.key || Core.makeContextKey(platform, profile));
 
-  if (!tabId || !profile) {
+  if (!tabId || !profile || profile === "criador_demo") {
     throw new Error("Abra um perfil público do Instagram, TikTok ou a aba Shorts de um canal do YouTube.");
   }
 
@@ -113,9 +166,11 @@ async function handleStartAnalysis(message) {
     scope,
     filters,
     stage: "Iniciando varredura Robin...",
-    percent: 4,
+    percent: 5,
     updatedAt: Date.now()
   });
+
+  resetAnalysisWatchdog(tabId, key, profile, platform);
 
   const resp = await chrome.tabs.sendMessage(tabId, {
     type: "ROBIN_ANALYZE_PROFILE",
@@ -130,6 +185,7 @@ async function handleStartAnalysis(message) {
   });
 
   if (!resp?.started) {
+    clearAnalysisWatchdog();
     throw new Error(resp?.error || "Não foi possível iniciar a mineração nesta aba.");
   }
   return { ok: true };
@@ -177,6 +233,7 @@ async function handleAnalysisComplete(message, sender) {
     scope: message.scope || "all",
     updatedAt: Date.now()
   });
+  clearAnalysisWatchdog();
 }
 
 async function recordDownloadedShortcodes(key, shortcodes = []) {
@@ -436,6 +493,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           const res = await handleStartAnalysis(message);
           sendResponse(res);
         } catch (err) {
+          clearAnalysisWatchdog();
           await setStorageState("analysisJob", {
             status: "error",
             platform: message.platform,
@@ -453,10 +511,17 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       case "ANALYSIS_PROGRESS": {
         if (sender.tab) {
           const ctx = Core.detectPlatformContext(sender.tab.url || "");
+          const targetPlatform = message.progress?.platform || ctx?.platform || "instagram";
+          const targetProfile = message.progress?.profile || ctx?.profile || "";
+          const targetKey = message.progress?.key || Core.makeContextKey(targetPlatform, targetProfile);
+
+          resetAnalysisWatchdog(sender.tab.id, targetKey, targetProfile, targetPlatform);
+
           await setStorageState("analysisJob", {
             ...message.progress,
-            platform: message.progress?.platform || ctx?.platform || "instagram",
-            key: message.progress?.key || Core.makeContextKey(ctx?.platform || "instagram", message.progress?.profile),
+            platform: targetPlatform,
+            key: targetKey,
+            profile: targetProfile,
             status: "running",
             tabId: sender.tab.id,
             updatedAt: Date.now()
@@ -467,6 +532,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       }
 
       case "ANALYSIS_COMPLETE": {
+        clearAnalysisWatchdog();
         if (sender.tab) {
           await handleAnalysisComplete(message, sender);
         }
@@ -475,6 +541,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       }
 
       case "ANALYSIS_ERROR": {
+        clearAnalysisWatchdog();
         if (sender.tab) {
           const ctx = Core.detectPlatformContext(sender.tab.url || "");
           await setStorageState("analysisJob", {

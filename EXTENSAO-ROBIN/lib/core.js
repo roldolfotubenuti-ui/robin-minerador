@@ -1,4 +1,4 @@
-﻿"use strict";
+"use strict";
 
 (() => {
   if (globalThis.RobinCore) return;
@@ -393,7 +393,7 @@
         comments: entry.comments,
         shares: Math.round(entry.likes * 0.14),
         timestamp: Math.floor((Date.now() - entry.daysAgo * 86400000) / 1000),
-        thumbnail: "",
+        thumbnail: `assets/demo_thumb_${idx + 1}.jpg`,
         videoUrl: "",
         caption: `${entry.caption} (@${profile})`,
         demo: true
@@ -418,7 +418,8 @@
     isValidMediaUrl,
     walkObjectTree,
     generateMetricsCsv,
-    JDarkZipArchive,
+    RobinZipArchive,
+    JDarkZipArchive: RobinZipArchive,
     createDemoDataset
   };
 })();

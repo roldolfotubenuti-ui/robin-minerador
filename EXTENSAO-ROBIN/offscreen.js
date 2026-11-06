@@ -1,4 +1,4 @@
-﻿"use strict";
+"use strict";
 
 (() => {
   const Core = globalThis.RobinCore || globalThis.JDarkCore;
@@ -189,12 +189,105 @@
     return { succeeded, filename: zipFilename };
   }
 
+  async function processDemoExport({ reels, job, includeCsv }) {
+    emitProgress(job, {
+      stage: "Preparando pacote de demonstração (CSV com métricas + orientações)...",
+      percent: 30,
+      partCount: 1
+    });
+
+    const archive = new (Core.RobinZipArchive || Core.JDarkZipArchive)();
+    const safeProfile = Core.sanitizeSlug(job.profile || "criador_demo", "perfil");
+
+    // 1. Incluir planilha CSV com as métricas demonstrativas
+    const csvText = Core.generateMetricsCsv(job.profile || "criador_demo", reels, job.platform || "instagram");
+    archive.addFile("metricas_demonstracao_robin.csv", new TextEncoder().encode(csvText));
+
+    // 2. Incluir arquivo explicativo LEIA-ME-DEMO.txt
+    const readmeContent = [
+      "ROBIN MINERADOR — PACOTE DE DEMONSTRAÇÃO (MODO DEMO)",
+      "===================================================================",
+      "",
+      "AVISO: Este pacote foi gerado pelo Modo de Demonstração do Robin Minerador.",
+      "Todos os dados, métricas e identificadores contidos nesta pasta são simulados,",
+      "criados para ilustrar a experiência de mineração, score viral e exportação.",
+      "",
+      "CONTEÚDO DO PACOTE:",
+      "- metricas_demonstracao_robin.csv: Tabela com métricas completas dos 6 vídeos simulados",
+      "  (Visualizações, Curtidas, Comentários, Compartilhamentos, Score Viral e URLs).",
+      "- LEIA-ME-DEMO.txt: Este documento explicativo.",
+      "",
+      "COMO BAIXAR VÍDEOS REAIS EM MP4:",
+      "1. Abra um perfil real no Instagram, TikTok ou canal do YouTube (aba Shorts).",
+      "2. Na extensão Robin Minerador, desative o Modo Demo.",
+      "3. Clique em 'MINERAR PERFIL AGORA'.",
+      "4. Selecione os vídeos desejados e clique em 'BAIXAR SELECIONADOS'.",
+      "   O Robin Minerador baixará os arquivos .MP4 originais em alta definição.",
+      "",
+      "Equipe Robin Minerador",
+      `Exportado em: ${new Date().toLocaleString("pt-BR")}`
+    ].join("\r\n");
+    archive.addFile("LEIA-ME-DEMO.txt", new TextEncoder().encode(readmeContent));
+
+    emitProgress(job, {
+      stage: "Compactando arquivo ZIP demonstrativo...",
+      percent: 85
+    });
+
+    const dateStr = new Date().toISOString().slice(0, 10);
+    const zipFilename = `Robin/Robin_DEMO_${safeProfile}_${dateStr}.zip`;
+    await sendBlobToBackground(archive.toBlob(), zipFilename, reels.map((r) => r.shortcode), {
+      ...job,
+      part: 1,
+      partCount: 1
+    });
+
+    await chrome.runtime.sendMessage({
+      type: "OFFSCREEN_COMPLETE",
+      job: {
+        ...job,
+        status: "complete",
+        stage: "Pacote demo exportado com sucesso",
+        percent: 100,
+        completed: reels.length,
+        failed: 0,
+        failures: [],
+        filename: zipFilename,
+        filenames: [zipFilename],
+        partCount: 1,
+        updatedAt: Date.now()
+      }
+    });
+  }
+
   async function executeOffscreenDownload(message) {
     if (workerBusy) throw new Error("Já existe uma compactação em andamento.");
     workerBusy = true;
     cancelFlag = false;
 
     const { job, reels, includeCsv } = message;
+
+    // Se todos os itens forem demonstrativos, gerar pacote exclusivo sem downloads fake
+    if (reels && reels.length > 0 && reels.every((r) => r.demo)) {
+      try {
+        await processDemoExport({ reels, job, includeCsv });
+      } catch (err) {
+        emitProgress(job, {
+          status: "error",
+          stage: "Falha na exportação demo",
+          error: err.message,
+          failures: []
+        });
+      } finally {
+        workerBusy = false;
+        for (const url of createdObjectUrls) {
+          URL.revokeObjectURL(url);
+        }
+        createdObjectUrls.clear();
+      }
+      return;
+    }
+
     const counters = { processed: 0, completed: 0, failures: [] };
     const allSucceeded = [];
     const savedFilenames = [];
