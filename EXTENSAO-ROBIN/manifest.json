@@ -2,6 +2,7 @@
   "manifest_version": 3,
   "name": "Robin-minerador",
   "version": "1.0.0",
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEArM6b60ZcuXxiKziSG/9LbqpAZKQ5jKHflwfUeFzHDFcYAIC3bhcucvXIDydSWQhn9iqTXtcSNEv1Nkzhk9Q2bo6+ddEBdKye5aaCX+jVD00wuX170TTTHpwLAdadnxd/xzgg2DMEp2zmZxgfH10UvMnNimehCseECnVqDpkJpqefkqM/+yqO5Zcu5262GlfuzU3chXr4K8EMIZYlW5VguIQWML4FuFJ/5fi/A7ezP39Y5ZjO5Uy3X7JSPDM+GOh4jj0HynscONv1ruf8nEwpXhY6I+SLdP43OKXCzRlrWV1Sf1cWdgdCM3lZ2MxGWXYBoXl8OYHud7s+GMsu7Amb2wIDAQAB",
   "description": "Analise métricas, calcule potencial viral, selecione na página e baixe vídeos do Instagram Reels, TikTok e YouTube Shorts.",
   "icons": {
     "16": "icons/icon-16.png",

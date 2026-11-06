@@ -8,6 +8,7 @@ using System.IO.Compression;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -43,6 +44,11 @@ namespace RobinCompanion
         public string archiveMode { get; set; }
         public int batchSize { get; set; }
         public bool includeCsv { get; set; }
+        public string deviceId { get; set; }
+        public string userId { get; set; }
+        public string sessionToken { get; set; }
+        public string authTicket { get; set; }
+        public long ticketExpiresAt { get; set; }
         public List<JobItemRequest> items { get; set; }
     }
 
@@ -175,6 +181,152 @@ namespace RobinCompanion
         }
     }
 
+    public static class MachineDeviceManager
+    {
+        private static readonly object SyncLock = new object();
+        private static string _cachedDeviceId;
+        private static string _cachedPublicKeyXml;
+        private static RSACryptoServiceProvider _rsa;
+        private static readonly byte[] Entropy = Encoding.UTF8.GetBytes("ROBIN_DEVICE_IDENTITY_ENTROPY_v1_dpapi");
+
+        public static string DeviceId
+        {
+            get
+            {
+                EnsureInitialized();
+                return _cachedDeviceId;
+            }
+        }
+
+        public static string PublicKeyXml
+        {
+            get
+            {
+                EnsureInitialized();
+                return _cachedPublicKeyXml;
+            }
+        }
+
+        public static void EnsureInitialized()
+        {
+            if (_rsa != null) return;
+            lock (SyncLock)
+            {
+                if (_rsa != null) return;
+
+                string baseDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "Robin", "DeviceIdentity");
+                Directory.CreateDirectory(baseDir);
+
+                string keyPath = Path.Combine(baseDir, "device.key.dpapi");
+                string idPath = Path.Combine(baseDir, "device.id");
+                string pubPath = Path.Combine(baseDir, "device.pub");
+
+                if (File.Exists(keyPath) && File.Exists(idPath) && File.Exists(pubPath))
+                {
+                    try
+                    {
+                        byte[] encBytes = File.ReadAllBytes(keyPath);
+                        byte[] rawBytes = ProtectedData.Unprotect(encBytes, Entropy, DataProtectionScope.LocalMachine);
+                        var rsa = new RSACryptoServiceProvider(2048);
+                        rsa.ImportCspBlob(rawBytes);
+
+                        _rsa = rsa;
+                        _cachedDeviceId = File.ReadAllText(idPath, Encoding.UTF8).Trim();
+                        _cachedPublicKeyXml = File.ReadAllText(pubPath, Encoding.UTF8).Trim();
+                        return;
+                    }
+                    catch
+                    {
+                        // Se estiver corrompido ou copiado de outro PC, gera uma nova chave atrelada a este PC
+                    }
+                }
+
+                var newRsa = new RSACryptoServiceProvider(2048);
+                byte[] cspBlob = newRsa.ExportCspBlob(true);
+                byte[] protectedBytes = ProtectedData.Protect(cspBlob, Entropy, DataProtectionScope.LocalMachine);
+                File.WriteAllBytes(keyPath, protectedBytes);
+
+                byte[] pubBlob = newRsa.ExportCspBlob(false);
+                using (var sha = SHA256.Create())
+                {
+                    byte[] hash = sha.ComputeHash(pubBlob);
+                    StringBuilder sb = new StringBuilder("ROBIN-PC-");
+                    for (int i = 0; i < hash.Length; i++)
+                    {
+                        sb.Append(hash[i].ToString("x2"));
+                    }
+                    _cachedDeviceId = sb.ToString();
+                }
+
+                _cachedPublicKeyXml = newRsa.ToXmlString(false);
+
+                File.WriteAllText(idPath, _cachedDeviceId, Encoding.UTF8);
+                File.WriteAllText(pubPath, _cachedPublicKeyXml, Encoding.UTF8);
+                _rsa = newRsa;
+            }
+        }
+
+        public static string SignPayload(string payload)
+        {
+            EnsureInitialized();
+            byte[] data = Encoding.UTF8.GetBytes(payload ?? "");
+            byte[] sig = _rsa.SignData(data, CryptoConfig.MapNameToOID("SHA256"));
+            return Convert.ToBase64String(sig);
+        }
+
+        public static bool VerifySignature(string payload, string signatureBase64, string publicKeyXml = null)
+        {
+            try
+            {
+                byte[] data = Encoding.UTF8.GetBytes(payload ?? "");
+                byte[] sig = Convert.FromBase64String(signatureBase64);
+                if (string.IsNullOrEmpty(publicKeyXml))
+                {
+                    EnsureInitialized();
+                    return _rsa.VerifyData(data, CryptoConfig.MapNameToOID("SHA256"), sig);
+                }
+                using (var rsaCheck = new RSACryptoServiceProvider())
+                {
+                    rsaCheck.FromXmlString(publicKeyXml);
+                    return rsaCheck.VerifyData(data, CryptoConfig.MapNameToOID("SHA256"), sig);
+                }
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private const string BackendPublicKeyXml = "<RSAKeyValue><Modulus>v+DOr++gkTRiEDhvqqdcn/PHIOf0Nbw3sJzIXiKsF1VHYzSz/Rbg9T3DWo8VeRJaLeK/DgOFmewDqzUj+fKrTiNn+fLEVFvy0NVAWjX7kaFptl0kQm+4Ye4LWC/MuZK8MY3AtF/fHeK7LyMsmbeDzjdmpLZhSAM726kQzFNkmA0NPktzbW5O/LS8Fe9FFrKpReJbZOckGyAO5BOy9991BSDuuKtxLThZ2CuvxwxAQNKBLjgl4nZIyDq51b2UlwcDlMtFt7cWcskl1/HsBkIiF4QYcZPYQ9GpqYNZZl0dybbEZGC2D451Zb0YEKwDsUDhkl3Q4M4HbNz6wIA+HD1IQw==</Modulus><Exponent>AQAB</Exponent></RSAKeyValue>";
+
+        public static bool VerifyDownloadTicket(string userId, string deviceId, long expiresAt, int itemCount, string ticketBase64)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(deviceId) || string.IsNullOrEmpty(ticketBase64))
+                    return false;
+
+                long now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+                if (expiresAt < now)
+                    return false;
+
+                string payload = userId + ":" + deviceId + ":" + expiresAt + ":" + itemCount;
+                byte[] data = Encoding.UTF8.GetBytes(payload);
+                byte[] signature = Convert.FromBase64String(ticketBase64);
+
+                using (var rsa = new RSACryptoServiceProvider())
+                {
+                    rsa.FromXmlString(BackendPublicKeyXml);
+                    return rsa.VerifyData(data, CryptoConfig.MapNameToOID("SHA256"), signature);
+                }
+            }
+            catch
+            {
+                return false;
+            }
+        }
+    }
+
     internal static class Program
     {
         private const string ListenPrefix = "http://127.0.0.1:17832/";
@@ -271,12 +423,80 @@ namespace RobinCompanion
             return exeName;
         }
 
+        // ID Oficial da Extensão Robin Minerador (derivado da chave pública permanente no manifest.json)
+        public const string OfficialExtensionId = "hgincoajmnejgbedgohffbjalbfddnin";
+
+        // Conjunto de IDs autorizados (Extensão Oficial + Configuração de Desenvolvimento)
+        private static readonly HashSet<string> AllowedExtensionIds = InitializeAllowedExtensionIds();
+
+        // Portas locais de desenvolvimento removidas da configuração comercial
+        // Permitida apenas a porta local do próprio serviço Companion
+        private static readonly HashSet<int> AllowedLocalPorts = new HashSet<int> { 17832 };
+
+        private static HashSet<string> InitializeAllowedExtensionIds()
+        {
+            var ids = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { OfficialExtensionId };
+
+            // Variável de ambiente opcional para testes em desenvolvimento
+            string envDev = Environment.GetEnvironmentVariable("ROBIN_DEV_EXTENSION_ID");
+            if (!string.IsNullOrEmpty(envDev))
+            {
+                ids.Add(envDev.Trim());
+            }
+
+            // Arquivo opcional local dev_extension_id.txt
+            try
+            {
+                string devFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "dev_extension_id.txt");
+                if (File.Exists(devFile))
+                {
+                    foreach (string line in File.ReadAllLines(devFile))
+                    {
+                        string trimmed = line.Trim();
+                        if (trimmed.Length == 32) ids.Add(trimmed);
+                    }
+                }
+            }
+            catch { }
+
+            return ids;
+        }
+
+        private static bool IsAuthorizedOrigin(string origin)
+        {
+            if (string.IsNullOrEmpty(origin)) return false;
+            if (!Uri.TryCreate(origin.Trim(), UriKind.Absolute, out Uri uri)) return false;
+
+            // CORREÇÃO 1: Validação por comparação EXATA com o ID da extensão oficial
+            if (string.Equals(uri.Scheme, "chrome-extension", StringComparison.OrdinalIgnoreCase))
+            {
+                return AllowedExtensionIds.Contains(uri.Host);
+            }
+
+            // CORREÇÃO 2: Portas locais estritamente restritas
+            if (string.Equals(uri.Scheme, "http", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(uri.Scheme, "https", StringComparison.OrdinalIgnoreCase))
+            {
+                if (string.Equals(uri.Host, "127.0.0.1", StringComparison.OrdinalIgnoreCase) ||
+                    string.Equals(uri.Host, "localhost", StringComparison.OrdinalIgnoreCase) ||
+                    string.Equals(uri.Host, "[::1]", StringComparison.OrdinalIgnoreCase))
+                {
+                    return AllowedLocalPorts.Contains(uri.Port);
+                }
+            }
+
+            return false;
+        }
+
         private static void ApplyCors(HttpListenerRequest req, HttpListenerResponse res)
         {
-            string origin = req.Headers["Origin"] ?? "*";
-            res.Headers["Access-Control-Allow-Origin"] = origin;
-            res.Headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS";
-            res.Headers["Access-Control-Allow-Headers"] = "Content-Type, Accept";
+            string origin = req.Headers["Origin"];
+            if (!string.IsNullOrEmpty(origin) && IsAuthorizedOrigin(origin))
+            {
+                res.Headers["Access-Control-Allow-Origin"] = origin;
+                res.Headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS";
+                res.Headers["Access-Control-Allow-Headers"] = "Content-Type, Accept, X-Robin-Client";
+            }
             res.Headers["Cache-Control"] = "no-store";
         }
 
@@ -297,15 +517,48 @@ namespace RobinCompanion
             var res = ctx.Response;
             ApplyCors(req, res);
 
+            string origin = req.Headers["Origin"];
+            string path = (req.Url != null ? req.Url.AbsolutePath : "").TrimEnd('/');
+            if (string.IsNullOrEmpty(path)) path = "/";
+
+            // CORREÇÃO 1 & 2: Validação estrita de Origin se origin estiver presente
+            if (!string.IsNullOrEmpty(origin))
+            {
+                if (!IsAuthorizedOrigin(origin))
+                {
+                    SendJson(res, 403, new Dictionary<string, object>
+                    {
+                        { "ok", false },
+                        { "error", "Origem não autorizada. Acesso restrito à extensão oficial Robin Minerador e ao localhost." }
+                    });
+                    return;
+                }
+            }
+            else
+            {
+                // CORREÇÃO 3: Origin ausente - não tratar como prova de legitimidade
+                // /health é permitida sem credenciais para monitoramento operacional básico
+                if (path != "/health" && path != "/" && path != "/status")
+                {
+                    string clientHeader = req.Headers["X-Robin-Client"];
+                    if (string.IsNullOrEmpty(clientHeader) || !string.Equals(clientHeader, "robin-extension-v2", StringComparison.OrdinalIgnoreCase))
+                    {
+                        SendJson(res, 401, new Dictionary<string, object>
+                        {
+                            { "ok", false },
+                            { "error", "Requisição não autorizada. O cabeçalho X-Robin-Client é obrigatório para chamadas locais." }
+                        });
+                        return;
+                    }
+                }
+            }
+
             if (req.HttpMethod == "OPTIONS")
             {
                 res.StatusCode = 204;
                 res.Close();
                 return;
             }
-
-            string path = (req.Url != null ? req.Url.AbsolutePath : "").TrimEnd('/');
-            if (string.IsNullOrEmpty(path)) path = "/";
 
             try
             {
@@ -318,9 +571,114 @@ namespace RobinCompanion
                         { "serviceAlt", "jdark-companion" },
                         { "version", "2.0.0" },
                         { "concurrency", DefaultMaxConcurrency },
-                        { "outputDir", ResolveOutputDir() },
                         { "ytDlp", File.Exists(FindResourceBinary("yt-dlp.exe")) },
                         { "ffmpeg", File.Exists(FindResourceBinary("ffmpeg.exe")) }
+                    });
+                    return;
+                }
+
+                if (req.HttpMethod == "GET" && path == "/device/identity")
+                {
+                    SendJson(res, 200, new Dictionary<string, object>
+                    {
+                        { "ok", true },
+                        { "deviceId", MachineDeviceManager.DeviceId },
+                        { "publicKey", MachineDeviceManager.PublicKeyXml },
+                        { "platform", "windows" },
+                        { "version", "2.0.0" }
+                    });
+                    return;
+                }
+
+                if (req.HttpMethod == "POST" && path == "/device/sign")
+                {
+                    string body;
+                    using (var reader = new StreamReader(req.InputStream, Encoding.UTF8))
+                    {
+                        body = reader.ReadToEnd();
+                    }
+                    var dict = JsonHelper.Deserialize<Dictionary<string, string>>(body);
+                    string payload = dict != null && dict.ContainsKey("payload") ? dict["payload"] : "";
+                    if (string.IsNullOrEmpty(payload))
+                    {
+                        SendJson(res, 400, new Dictionary<string, object> { { "ok", false }, { "error", "Payload para assinatura não fornecido." } });
+                        return;
+                    }
+
+                    // Validação de formato seguro para assinatura: email:deviceId:nonce:timestamp ou email:timestamp:nonce
+                    string[] parts = payload.Split(':');
+                    if (parts.Length == 4)
+                    {
+                        string emailPart = parts[0];
+                        string devPart = parts[1];
+                        string noncePart = parts[2];
+                        string tsPart = parts[3];
+
+                        if (!emailPart.Contains("@") || !string.Equals(devPart, MachineDeviceManager.DeviceId, StringComparison.OrdinalIgnoreCase) || noncePart.Length < 8 || !long.TryParse(tsPart, out long ts4))
+                        {
+                            SendJson(res, 400, new Dictionary<string, object> { { "ok", false }, { "error", "Desafio de dispositivo inválido ou vinculado a outro computador." } });
+                            return;
+                        }
+                        long now4 = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+                        if (Math.Abs(now4 - ts4) > 300000)
+                        {
+                            SendJson(res, 400, new Dictionary<string, object> { { "ok", false }, { "error", "Desafio expirado para prova de login." } });
+                            return;
+                        }
+                    }
+                    else if (parts.Length == 3)
+                    {
+                        string emailPart = parts[0];
+                        string tsPart = parts[1];
+                        string noncePart = parts[2];
+
+                        if (!emailPart.Contains("@") || !long.TryParse(tsPart, out long ts3) || noncePart.Length < 4)
+                        {
+                            SendJson(res, 400, new Dictionary<string, object> { { "ok", false }, { "error", "Formato de payload inválido para prova de login." } });
+                            return;
+                        }
+                        long now3 = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+                        if (Math.Abs(now3 - ts3) > 300000)
+                        {
+                            SendJson(res, 400, new Dictionary<string, object> { { "ok", false }, { "error", "Timestamp expirado para prova de login." } });
+                            return;
+                        }
+                    }
+                    else
+                    {
+                        SendJson(res, 400, new Dictionary<string, object> { { "ok", false }, { "error", "Formato de payload inválido para assinatura de dispositivo." } });
+                        return;
+                    }
+
+                    string signature = MachineDeviceManager.SignPayload(payload);
+                    SendJson(res, 200, new Dictionary<string, object>
+                    {
+                        { "ok", true },
+                        { "deviceId", MachineDeviceManager.DeviceId },
+                        { "publicKey", MachineDeviceManager.PublicKeyXml },
+                        { "signature", signature },
+                        { "payload", payload },
+                        { "timestamp", DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() }
+                    });
+                    return;
+                }
+
+                if (req.HttpMethod == "POST" && path == "/device/verify")
+                {
+                    string body;
+                    using (var reader = new StreamReader(req.InputStream, Encoding.UTF8))
+                    {
+                        body = reader.ReadToEnd();
+                    }
+                    var dict = JsonHelper.Deserialize<Dictionary<string, string>>(body);
+                    string payload = dict != null && dict.ContainsKey("payload") ? dict["payload"] : "";
+                    string sig = dict != null && dict.ContainsKey("signature") ? dict["signature"] : "";
+                    string pub = dict != null && dict.ContainsKey("publicKey") ? dict["publicKey"] : null;
+                    bool valid = MachineDeviceManager.VerifySignature(payload, sig, pub);
+                    SendJson(res, 200, new Dictionary<string, object>
+                    {
+                        { "ok", true },
+                        { "valid", valid }
                     });
                     return;
                 }
@@ -353,7 +711,31 @@ namespace RobinCompanion
                     }
 
                     var createReq = JsonHelper.Deserialize<CreateJobRequest>(body);
-                    if (createReq == null || createReq.items == null || createReq.items.Count == 0)
+
+                    // 1. Validação de identidade do computador físico
+                    if (createReq == null || string.IsNullOrEmpty(createReq.deviceId) || !string.Equals(createReq.deviceId, MachineDeviceManager.DeviceId, StringComparison.OrdinalIgnoreCase))
+                    {
+                        SendJson(res, 403, new Dictionary<string, object>
+                        {
+                            { "ok", false },
+                            { "error", "Dispositivo não autorizado neste computador. Operação bloqueada pelo Robin Companion." }
+                        });
+                        return;
+                    }
+
+                    // 2. Validação da autorização criptográfica do backend (Ticket HMAC-SHA256)
+                    int itemCount = createReq.items != null ? createReq.items.Count : 0;
+                    if (!MachineDeviceManager.VerifyDownloadTicket(createReq.userId, createReq.deviceId, createReq.ticketExpiresAt, itemCount, createReq.authTicket))
+                    {
+                        SendJson(res, 403, new Dictionary<string, object>
+                        {
+                            { "ok", false },
+                            { "error", "Autorização de download ausente, inválida ou expirada. Certifique-se de que sua assinatura do Robin Minerador está ativa." }
+                        });
+                        return;
+                    }
+
+                    if (itemCount == 0)
                     {
                         SendJson(res, 400, new Dictionary<string, object> { { "ok", false }, { "error", "Lista de vídeos vazia." } });
                         return;

@@ -109,7 +109,7 @@
         const { user, token } = await globalThis.RobinAuth.getStoredSession();
         if (!user || !token) return;
         const res = await globalThis.RobinAuth.checkSession();
-        if (!res.authorized || res.code === "USER_INACTIVE" || res.code === "USER_EXPIRED") {
+        if (!res.authorized || res.code === "USER_INACTIVE" || res.code === "USER_EXPIRED" || res.code === "DEVICE_MISMATCH") {
           stopSessionHeartbeat();
           await handleLogout();
           showAuthAlert(res.error || "Sua conta foi inativada ou expirou. Acesso bloqueado.", "error");
@@ -232,7 +232,7 @@
       if (check && check.authorized) {
         updateAuthUI(check);
         showToast("Login realizado com sucesso! Bem-vindo(a).");
-      } else if (check?.code === "USER_INACTIVE" || check?.code === "USER_EXPIRED") {
+      } else if (check?.code === "USER_INACTIVE" || check?.code === "USER_EXPIRED" || check?.code === "DEVICE_MISMATCH") {
         showAuthAlert(check?.error || "Esta conta foi inativada ou expirou. Contate o administrador.", "error");
       } else {
         showAuthAlert(check?.error || "E-mail ou senha incorretos.", "error");
@@ -319,13 +319,14 @@
 
       return `
         <tr>
-          <td><strong>${escapeHtml(u.email)}</strong></td>
+          <td><strong>${escapeHtml(u.email)}</strong>${u.bound_device_id ? `<div style="font-size: 10px; color: var(--accent); margin-top: 2px;" title="${escapeHtml(u.bound_device_id)}">💻 PC: ${escapeHtml(u.bound_device_id.slice(0, 16))}...</div>` : `<div style="font-size: 10px; color: var(--text-muted); margin-top: 2px;">💻 PC: Livre</div>`}</td>
           <td><span class="badge-role-${u.role}">${isAdmin ? "Master" : "Comum"}</span></td>
           <td><span class="badge-status-${u.status}">${isActive ? "Ativo" : "Inativo"}</span></td>
           <td>${validityHtml}</td>
           <td><small>Downloads: ${downloadsText} · Varreduras: ${scrapesText}</small></td>
           <td style="text-align: right; white-space: nowrap;">
             ${!isAdmin ? `<button type="button" class="btn-table-action btn-table-add-days" data-user-action="add-days" data-id="${u.id}" data-email="${escapeHtml(u.email)}" title="Adicionar +30 dias de assinatura">+30 Dias</button>` : ""}
+            ${!isAdmin && u.bound_device_id ? `<button type="button" class="btn-table-action btn-table-reset-device" data-user-action="reset-device" data-id="${u.id}" data-email="${escapeHtml(u.email)}" title="Desvincular Computador">Desvincular PC</button>` : ""}
             <button type="button" class="btn-table-action ${isActive ? "btn-table-toggle-deactivate" : "btn-table-toggle-activate"}" data-user-action="toggle-status" data-id="${u.id}" data-current="${u.status}">
               ${isActive ? "Inativar" : "Ativar"}
             </button>
@@ -1050,7 +1051,23 @@
       const action = btn.dataset.userAction;
       const id = btn.dataset.id;
 
-      if (action === "add-days") {
+            if (action === "reset-device") {
+        const email = btn.dataset.email;
+        if (!confirm(`Deseja desvincular o computador atual da conta ${email}?\n\nIsso permitirá que o assinante vincule um novo computador no próximo login.`)) return;
+        try {
+          btn.disabled = true;
+          const res = await globalThis.RobinAuth.adminResetUserDevice(id);
+          showToast(res?.message || "Computador desvinculado com sucesso!");
+          await loadAndRenderAdminUsers();
+        } catch (err) {
+          showToast(err.message, true);
+        } finally {
+          btn.disabled = false;
+        }
+        return;
+      }
+
+if (action === "add-days") {
         const email = btn.dataset.email;
         if (!confirm(`Deseja adicionar +30 dias de assinatura para ${email}?`)) return;
         try {

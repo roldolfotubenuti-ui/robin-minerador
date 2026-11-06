@@ -253,15 +253,29 @@ async function startCompanionJob(job, reels, includeCsv) {
     throw new Error("O Robin Companion não está aberto em 127.0.0.1:17832. Abra o Robin Companion para baixar vídeos do TikTok ou YouTube Shorts.");
   }
 
+  // Obter autorização criptográfica do backend vinculada ao usuário, dispositivo e validade da licença
+  let authData = null;
+  if (Auth && Auth.authorizeDownloadJob) {
+    authData = await Auth.authorizeDownloadJob(reels.length);
+  }
+
   const res = await fetch(`${COMPANION_BASE_URL}/jobs`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      "X-Robin-Client": "robin-extension-v2"
+    },
     body: JSON.stringify({
       platform: job.platform,
       profile: job.profile,
       archiveMode: job.archiveMode,
       batchSize: job.batchSize,
       includeCsv: includeCsv !== false,
+      deviceId: authData?.deviceId || "",
+      userId: authData?.userId || "",
+      sessionToken: authData?.sessionToken || "",
+      authTicket: authData?.ticket || "",
+      ticketExpiresAt: authData?.expiresAt || 0,
       items: reels.map((r, i) => ({
         shortcode: r.shortcode,
         permalink: r.permalink,
@@ -315,7 +329,10 @@ async function pollActiveCompanionJob() {
   }
 
   try {
-    const res = await fetch(`${COMPANION_BASE_URL}/jobs/${encodeURIComponent(active.id)}`, { cache: "no-store" });
+    const res = await fetch(`${COMPANION_BASE_URL}/jobs/${encodeURIComponent(active.id)}`, {
+      cache: "no-store",
+      headers: { "X-Robin-Client": "robin-extension-v2" }
+    });
     const data = await res.json().catch(() => ({}));
     if (!res.ok || !data?.ok || !data?.job) throw new Error(data?.error || "Companion sem resposta");
 
@@ -432,7 +449,8 @@ async function handleCancelDownload(jobId) {
   const stored = await chrome.storage.local.get(["companionJob", "downloadJob"]);
   if (stored.companionJob?.id) {
     await fetch(`${COMPANION_BASE_URL}/jobs/${encodeURIComponent(stored.companionJob.id)}/cancel`, {
-      method: "POST"
+      method: "POST",
+      headers: { "X-Robin-Client": "robin-extension-v2" }
     }).catch(() => {});
     await chrome.storage.local.remove("companionJob");
     await chrome.alarms.clear(COMPANION_POLL_ALARM);

@@ -1,4 +1,4 @@
-﻿"use strict";
+"use strict";
 
 /**
  * Cliente de Autenticação Supabase e Gestão de Usuários para Robin - Minerador
@@ -40,9 +40,81 @@
     STORAGE_KEYS: {
       SESSION_TOKEN: "robin_session_token",
       USER_INFO: "robin_user_info",
-      REMEMBER_EMAIL: "robin_remember_email"
+      REMEMBER_EMAIL: "robin_remember_email",
+      DEVICE_ID: "robin_device_id"
     }
   };
+
+  const COMPANION_URL = "http://127.0.0.1:17832";
+
+  /**
+   * Obtém identidade persistente do computador e assinatura criptográfica via Robin Companion
+   */
+  async function getDeviceProof(email = "") {
+    try {
+      const idRes = await fetch(`${COMPANION_URL}/device/identity`, {
+        cache: "no-store",
+        headers: { "X-Robin-Client": "robin-extension-v2" }
+      });
+      const idData = await idRes.json().catch(() => ({}));
+      if (!idData?.ok || !idData?.deviceId) {
+        return { ok: false, error: "O Robin Companion precisa estar em execução no Windows para identificar este computador." };
+      }
+
+      // 2. Desafio vinculado de uso único gerado pelo Backend
+      let challengePayload = null;
+      let nonce = null;
+      let timestamp = Date.now();
+      const cleanEmail = (email && email.includes("@")) ? email.trim().toLowerCase() : null;
+
+      if (cleanEmail) {
+        try {
+          const chRes = await callRpc("app_create_device_challenge", {
+            p_email: cleanEmail,
+            p_device_id: idData.deviceId
+          });
+          if (chRes?.ok && chRes?.payload) {
+            challengePayload = chRes.payload;
+            nonce = chRes.serverNonce;
+            timestamp = chRes.timestamp;
+          }
+        } catch (_) {}
+      }
+
+      if (!challengePayload) {
+        const clientNonce = typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2);
+        nonce = clientNonce;
+        challengePayload = `${cleanEmail || "device-auth@robin.local"}:${idData.deviceId}:${clientNonce}:${timestamp}`;
+      }
+
+      const signRes = await fetch(`${COMPANION_URL}/device/sign`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Robin-Client": "robin-extension-v2"
+        },
+        body: JSON.stringify({ payload: challengePayload })
+      });
+      const signData = await signRes.json().catch(() => ({}));
+      if (!signData?.ok || !signData?.signature) {
+        return { ok: false, error: "Falha na comprovação criptográfica do computador." };
+      }
+
+      return {
+        ok: true,
+        deviceId: idData.deviceId,
+        publicKey: idData.publicKey,
+        signature: signData.signature,
+        nonce: nonce,
+        timestamp
+      };
+    } catch (_) {
+      return {
+        ok: false,
+        error: "O Robin Companion precisa estar em execução no Windows para identificar este computador."
+      };
+    }
+  }
 
   /**
    * Atualiza as credenciais do Supabase em tempo de execução ou persistidas
@@ -81,12 +153,14 @@
     return data;
   }
 
-  async function storeSession(user, token) {
+  async function storeSession(user, token, deviceId = null) {
     if (typeof chrome === "undefined" || !chrome?.storage?.local) return;
-    await chrome.storage.local.set({
+    const payload = {
       [CONFIG.STORAGE_KEYS.SESSION_TOKEN]: token,
       [CONFIG.STORAGE_KEYS.USER_INFO]: user
-    });
+    };
+    if (deviceId) payload[CONFIG.STORAGE_KEYS.DEVICE_ID] = deviceId;
+    await chrome.storage.local.set(payload);
   }
 
   async function clearStoredSession() {
@@ -94,24 +168,27 @@
     await chrome.storage.local.remove([
       CONFIG.STORAGE_KEYS.SESSION_TOKEN,
       CONFIG.STORAGE_KEYS.USER_INFO,
+      CONFIG.STORAGE_KEYS.DEVICE_ID,
       "authSession"
     ]);
   }
 
   async function getStoredSession() {
-    if (typeof chrome === "undefined" || !chrome?.storage?.local) return { user: null, token: null };
+    if (typeof chrome === "undefined" || !chrome?.storage?.local) return { user: null, token: null, deviceId: null };
     const data = await chrome.storage.local.get([
       CONFIG.STORAGE_KEYS.SESSION_TOKEN,
-      CONFIG.STORAGE_KEYS.USER_INFO
+      CONFIG.STORAGE_KEYS.USER_INFO,
+      CONFIG.STORAGE_KEYS.DEVICE_ID
     ]);
     return {
       token: data[CONFIG.STORAGE_KEYS.SESSION_TOKEN] || null,
-      user: data[CONFIG.STORAGE_KEYS.USER_INFO] || null
+      user: data[CONFIG.STORAGE_KEYS.USER_INFO] || null,
+      deviceId: data[CONFIG.STORAGE_KEYS.DEVICE_ID] || null
     };
   }
 
   /**
-   * Login Seguro com E-mail e Senha
+   * Login Seguro com E-mail e Senha (Vinculação 1 Conta = 1 Computador)
    */
   async function signIn(email, password) {
     const cleanEmail = String(email || "").trim().toLowerCase();
@@ -121,27 +198,43 @@
       throw new Error("Informe seu e-mail e senha.");
     }
 
+    // 1. Consulta identidade criptográfica persistente do computador via Robin Companion
+    const proof = await getDeviceProof(cleanEmail);
+
+    // 2. Chamada atômica ao Supabase com comprovação do dispositivo
     const res = await callRpc("app_login", {
       p_email: cleanEmail,
-      p_password: cleanPass
+      p_password: cleanPass,
+      p_device_id: proof.ok ? proof.deviceId : null,
+      p_public_key: proof.ok ? proof.publicKey : null,
+      p_signature: proof.ok ? proof.signature : null,
+      p_client_nonce: proof.ok ? proof.nonce : null,
+      p_timestamp: proof.ok ? proof.timestamp : null
     });
 
     if (!res || !res.ok) {
+      if (res?.code === "DEVICE_MISMATCH") {
+        throw new Error("Este e-mail já está vinculado a outro computador. Cada assinatura do Robin Minerador permite a utilização em apenas um PC. Entre em contato com o suporte caso precise de assistência.");
+      }
+      if (res?.code === "DEVICE_REQUIRED") {
+        throw new Error(res.error || "O Robin Companion precisa estar em execução no Windows para identificar este computador.");
+      }
       throw new Error(res?.error || "E-mail ou senha incorretos.");
     }
 
-    await storeSession(res.user, res.token);
+    await storeSession(res.user, res.token, proof?.deviceId || res.deviceId);
 
     return {
       ok: true,
       user: res.user,
-      token: res.token
+      token: res.token,
+      deviceId: proof?.deviceId || res.deviceId
     };
   }
 
   /**
-   * Verificação Contínua de Sessão e Status Ativo
-   * Se o usuário foi inativado ou excluído, desloga imediatamente.
+   * Verificação Contínua de Sessão e Status Ativo no Dispositivo Vinculado
+   * Se o usuário foi inativado, expirou ou o token foi levado para outro PC, desloga imediatamente.
    */
   async function checkSession() {
     const { user, token } = await getStoredSession();
@@ -150,9 +243,12 @@
     }
 
     try {
+      const proof = await getDeviceProof(user.email);
+
       const res = await callRpc("app_check_session", {
         p_user_id: user.id,
-        p_session_token: token
+        p_session_token: token,
+        p_device_id: proof.ok ? proof.deviceId : null
       });
 
       if (!res || !res.valid) {
@@ -160,14 +256,16 @@
         return {
           ok: false,
           authorized: false,
-          code: res?.status === "inactive" ? "USER_INACTIVE" : "INVALID_SESSION",
-          error: res?.error || "Sessão inválida ou conta inativada."
+          code: res?.code || (res?.status === "inactive" ? "USER_INACTIVE" : "INVALID_SESSION"),
+          error: res?.code === "DEVICE_MISMATCH"
+            ? "Este e-mail já está vinculado a outro computador. Cada assinatura do Robin Minerador permite a utilização em apenas um PC. Entre em contato com o suporte caso precise de assistência."
+            : (res?.error || "Sessão inválida ou conta inativada.")
         };
       }
 
       // Atualiza dados locais (como novos limites ou role)
       if (res.user) {
-        await storeSession(res.user, token);
+        await storeSession(res.user, token, proof?.deviceId);
       }
 
       return {
@@ -178,6 +276,7 @@
         role: (res.user || user).role,
         status: (res.user || user).status,
         expiresAt: (res.user || user).expires_at,
+        deviceId: proof?.deviceId,
         limits: {
           maxDownloads: (res.user || user).max_downloads_per_day,
           maxScrapes: (res.user || user).max_scrapes_per_day
@@ -350,6 +449,91 @@
   /**
    * Salva configurações customizadas do Supabase
    */
+  /**
+   * Desvincular computador de um assinante (Procedimento Administrativo Exclusivo para Troca de PC)
+   */
+  async function adminResetUserDevice(targetUserId) {
+    const { adminId, token } = await ensureAdminSession();
+    const res = await callRpc("app_admin_reset_user_device", {
+      p_admin_id: adminId,
+      p_session_token: token,
+      p_target_user_id: targetUserId
+    });
+    if (!res || !res.ok) {
+      throw new Error(res?.error || "Erro ao desvincular computador.");
+    }
+    return res;
+  }
+
+  
+  /**
+   * Emite ticket criptográfico de download assinado pelo Supabase
+   * Vincula usuário, dispositivo, sessão e assinatura ativa.
+   */
+  async function authorizeDownloadJob(videoCount = 1) {
+    const { user, token, deviceId } = await getStoredSession();
+    if (!user || !token) {
+      throw new Error("Faça login no Robin Minerador para baixar vídeos.");
+    }
+
+    const proof = await getDeviceProof(user.email);
+    const activeDeviceId = proof.ok ? proof.deviceId : deviceId;
+
+    if (!activeDeviceId) {
+      throw new Error("O Robin Companion precisa estar em execução no Windows para identificar este computador.");
+    }
+
+    let res = null;
+    try {
+      const fnUrl = `${CONFIG.SUPABASE_URL}/functions/v1/authorize-download`;
+      const fnResp = await fetch(fnUrl, {
+        method: "POST",
+        headers: {
+          "apikey": CONFIG.ANON_KEY,
+          "Authorization": `Bearer ${CONFIG.ANON_KEY}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          userId: user.id,
+          sessionToken: token,
+          deviceId: activeDeviceId,
+          videoCount: parseInt(videoCount, 10) || 1
+        })
+      });
+      if (fnResp.ok) {
+        res = await fnResp.json();
+      }
+    } catch (_) {}
+
+    if (!res) {
+      res = await callRpc("app_authorize_download", {
+        p_user_id: user.id,
+        p_session_token: token,
+        p_device_id: activeDeviceId,
+        p_video_count: parseInt(videoCount, 10) || 1
+      });
+    }
+
+    if (!res || !res.ok) {
+      if (res?.code === "DEVICE_MISMATCH") {
+        throw new Error("Este computador não está autorizado para esta assinatura. Cada conta funciona em apenas 1 PC.");
+      }
+      if (res?.code === "USER_EXPIRED") {
+        throw new Error("Sua assinatura mensal expirou. Renove seu plano para baixar vídeos.");
+      }
+      throw new Error(res?.error || "Autorização de download recusada pelo servidor.");
+    }
+
+    return {
+      ok: true,
+      ticket: res.ticket,
+      expiresAt: res.expiresAt,
+      userId: user.id,
+      deviceId: activeDeviceId,
+      sessionToken: token
+    };
+  }
+
   async function setSupabaseConfig(url, anonKey) {
     if (url) CONFIG.SUPABASE_URL = url.trim().replace(/\/+$/, "");
     if (anonKey) CONFIG.ANON_KEY = anonKey.trim();
@@ -375,6 +559,9 @@
     adminToggleUserStatus,
     adminUpdateUser,
     adminDeleteUser,
-    adminAddDays
+    adminAddDays,
+    adminResetUserDevice,
+    getDeviceProof,
+    authorizeDownloadJob
   };
 });

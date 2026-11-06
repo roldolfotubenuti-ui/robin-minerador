@@ -1885,6 +1885,17 @@ body.is-embedded .auth-wrapper {
   background: #bfdbfe;
   color: #1e40af;
 }
+.btn-table-reset-device {
+  background: #fef3c7;
+  color: #92400e;
+  border-color: #fde68a;
+  font-weight: 700;
+}
+.btn-table-reset-device:hover {
+  background: #fde68a;
+  color: #78350f;
+}
+
 
 .account-expires-text {
   font-size: 11px !important;
