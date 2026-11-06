@@ -330,10 +330,15 @@ async function pollActiveCompanionJob() {
     };
     await setStorageState("downloadJob", merged);
 
-    if (["complete", "error"].includes(data.job.status)) {
-      if (Array.isArray(data.job.completedShortcodes) && data.job.completedShortcodes.length) {
+    if (data.job.status === "complete") {
+      // Confirmação estrita: só registra shortcodes se o ZIP estiver validado e status for complete
+      if (data.job.zipVerified && Array.isArray(data.job.completedShortcodes) && data.job.completedShortcodes.length) {
         await recordDownloadedShortcodes(active.key, data.job.completedShortcodes);
       }
+      await chrome.storage.local.remove("companionJob");
+      await chrome.alarms.clear(COMPANION_POLL_ALARM);
+    } else if (data.job.status === "error") {
+      // Em caso de erro, NUNCA registra shortcodes como baixados
       await chrome.storage.local.remove("companionJob");
       await chrome.alarms.clear(COMPANION_POLL_ALARM);
     }
@@ -443,6 +448,81 @@ async function handleCancelDownload(jobId) {
   return { ok: true };
 }
 
+const pendingBrowserDownloads = new Map();
+
+chrome.downloads.onChanged.addListener(async (delta) => {
+  const downloadId = delta.id;
+  const tracked = pendingBrowserDownloads.get(downloadId);
+  if (!tracked) return;
+
+  if (delta.state?.current === "complete") {
+    pendingBrowserDownloads.delete(downloadId);
+    try {
+      let finalPath = tracked.filename;
+      let fileSize = 0;
+      try {
+        const [item] = await chrome.downloads.search({ id: downloadId });
+        if (item?.filename) finalPath = item.filename;
+        if (item?.fileSize) fileSize = item.fileSize;
+      } catch (_) {}
+
+      // Só registra shortcodes agora que o ZIP foi efetivamente gravado no disco
+      if (Array.isArray(tracked.shortcodes) && tracked.shortcodes.length && tracked.key) {
+        await recordDownloadedShortcodes(tracked.key, tracked.shortcodes);
+      }
+
+      const baseFilename = finalPath ? finalPath.replace(/^.*[\\/]/, '') : (tracked.filename ? tracked.filename.replace(/^.*[\\/]/, '') : "Robin_videos.zip");
+      const stored = await chrome.storage.local.get("downloadJob");
+      const currentJob = stored.downloadJob || {};
+      if (currentJob.id === tracked.jobId || currentJob.status === "running") {
+        await setStorageState("downloadJob", {
+          ...currentJob,
+          status: "complete",
+          stage: `Concluído — salvo em ${finalPath || "Downloads/Robin"}`,
+          percent: 100,
+          filename: baseFilename,
+          filenames: [baseFilename],
+          zipPath: finalPath,
+          zipSizeBytes: fileSize,
+          zipSizeFormatted: Core.formatCompactNumber ? `${Core.formatCompactNumber(fileSize)}B` : `${fileSize} bytes`,
+          zipVerified: true,
+          verifiedMp4Count: tracked.shortcodes.length,
+          completed: tracked.shortcodes.length,
+          updatedAt: Date.now()
+        });
+      }
+    } catch (err) {
+      console.error("Erro ao registrar conclusão do download:", err);
+    } finally {
+      if (tracked.objectUrl) {
+        chrome.runtime.sendMessage({
+          type: "OFFSCREEN_REVOKE_URL",
+          target: "offscreen",
+          objectUrl: tracked.objectUrl
+        }).catch(() => {});
+      }
+    }
+  } else if (delta.state?.current === "interrupted" || delta.error) {
+    pendingBrowserDownloads.delete(downloadId);
+    const errorMsg = delta.error?.current || delta.error || "Download interrompido pelo navegador.";
+    const stored = await chrome.storage.local.get("downloadJob");
+    await setStorageState("downloadJob", {
+      ...(stored.downloadJob || {}),
+      status: "error",
+      stage: "Falha na gravação do ZIP",
+      error: `Download não foi concluído: ${errorMsg}`,
+      updatedAt: Date.now()
+    });
+    if (tracked.objectUrl) {
+      chrome.runtime.sendMessage({
+        type: "OFFSCREEN_REVOKE_URL",
+        target: "offscreen",
+        objectUrl: tracked.objectUrl
+      }).catch(() => {});
+    }
+  }
+});
+
 async function handleDeliverOffscreenFile(message) {
   try {
     const downloadId = await chrome.downloads.download({
@@ -451,18 +531,27 @@ async function handleDeliverOffscreenFile(message) {
       saveAs: false,
       conflictAction: "uniquify"
     });
-    if (Array.isArray(message.shortcodes) && message.shortcodes.length && message.job?.key) {
-      await recordDownloadedShortcodes(message.job.key, message.shortcodes);
-    }
+
+    // Rastreia o downloadId aguardando confirmação física de gravação em disco
+    pendingBrowserDownloads.set(downloadId, {
+      jobId: message.job?.id,
+      key: message.job?.key,
+      shortcodes: message.shortcodes || [],
+      filename: message.filename,
+      objectUrl: message.objectUrl,
+      startedAt: Date.now()
+    });
+
     return { ok: true, downloadId };
   } catch (err) {
+    if (message.objectUrl) {
+      chrome.runtime.sendMessage({
+        type: "OFFSCREEN_REVOKE_URL",
+        target: "offscreen",
+        objectUrl: message.objectUrl
+      }).catch(() => {});
+    }
     return { ok: false, error: err.message };
-  } finally {
-    chrome.runtime.sendMessage({
-      type: "OFFSCREEN_REVOKE_URL",
-      target: "offscreen",
-      objectUrl: message.objectUrl
-    }).catch(() => {});
   }
 }
 
@@ -653,7 +742,18 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       }
 
       case "OFFSCREEN_COMPLETE": {
-        await setStorageState("downloadJob", message.job);
+        const hasPending = Array.from(pendingBrowserDownloads.values()).some((t) => t.jobId === message.job?.id);
+        if (hasPending) {
+          await setStorageState("downloadJob", {
+            ...message.job,
+            status: "running",
+            stage: "Salvando arquivo ZIP no disco...",
+            percent: 98,
+            updatedAt: Date.now()
+          });
+        } else {
+          await setStorageState("downloadJob", message.job);
+        }
         sendResponse({ ok: true });
         return;
       }

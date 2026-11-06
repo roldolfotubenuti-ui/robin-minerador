@@ -825,13 +825,38 @@
     const closeBtn = $("#btn-close-download-dialog");
 
     if (job.status === "running") {
-      summaryEl.textContent = "";
+      summaryEl.innerHTML = "";
       closeBtn.textContent = "CANCELAR DOWNLOAD";
     } else if (job.status === "complete") {
-      summaryEl.textContent = `✅ Concluído: ${job.completed || 0} vídeo(s) salvos em ${job.filenames?.length || 1} arquivo(s) ZIP.`;
+      const zipName = job.filename || (Array.isArray(job.filenames) && job.filenames[0]) || "Robin_videos.zip";
+      const zipPath = job.zipPath || "Downloads\\Robin";
+      const mp4Count = job.verifiedMp4Count || job.completed || 0;
+      const failuresCount = job.failed || (Array.isArray(job.failures) ? job.failures.length : 0);
+      const zipSize = job.zipSizeFormatted || (job.zipSizeBytes ? `${(job.zipSizeBytes / (1024 * 1024)).toFixed(1)} MB` : "");
+
+      summaryEl.innerHTML = `
+        <div style="background: rgba(34, 197, 94, 0.12); border: 1px solid rgba(34, 197, 94, 0.35); border-radius: 8px; padding: 12px; margin-top: 10px; font-size: 12px; line-height: 1.6; color: #f8fafc; text-align: left;">
+          <div style="color: #4ade80; font-weight: 700; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; font-size: 13px;">
+            <span>✅</span> <span>ZIP GRAVADO COM SUCESSO NO DISCO</span>
+          </div>
+          <div><strong>Arquivo:</strong> <code style="color: #cbd5e1; word-break: break-all;">${zipName}</code></div>
+          <div><strong>Destino:</strong> <span style="color: #a78bfa; word-break: break-all;">${zipPath}</span></div>
+          <div><strong>Vídeos MP4 incluídos:</strong> <span style="color: #38bdf8; font-weight: 600;">${mp4Count}</span></div>
+          ${failuresCount > 0 ? `<div style="color: #f87171;"><strong>Falhas:</strong> ${failuresCount} vídeo(s)</div>` : ""}
+          ${zipSize ? `<div><strong>Tamanho final:</strong> ${zipSize}</div>` : ""}
+        </div>
+      `;
       closeBtn.textContent = "FECHAR";
     } else if (job.status === "error") {
-      summaryEl.textContent = `❌ Erro: ${job.error || "Falha durante o download."}`;
+      summaryEl.innerHTML = `
+        <div style="background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.35); border-radius: 8px; padding: 12px; margin-top: 10px; font-size: 12px; line-height: 1.6; color: #f8fafc; text-align: left;">
+          <div style="color: #f87171; font-weight: 700; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; font-size: 13px;">
+            <span>❌</span> <span>FALHA NO DOWNLOAD DO ZIP</span>
+          </div>
+          <div style="word-break: break-word;">${job.error || "Falha durante o download."}</div>
+          <div style="margin-top: 6px; font-size: 11px; color: #94a3b8;">Sua seleção de vídeos continua salva. Você pode tentar novamente.</div>
+        </div>
+      `;
       closeBtn.textContent = "FECHAR";
     }
   }
