@@ -4,4 +4,7 @@ desktop.ini
 .DS_Store
 *.pem
 *.crx
+.vercel/
 
+.vercel
+.env*
